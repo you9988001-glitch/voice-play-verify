@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>voice play · Pi verification</title>
+
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#fff; }
+    .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { max-width:520px; width:100%; border:1px solid #e5e5e5; border-radius:16px; padding:20px; }
+    h1 { font-size:22px; margin:0 0 8px; }
+    p { margin:0 0 16px; line-height:1.4; color:#333; }
+    button { width:100%; padding:14px 16px; font-size:16px; border-radius:12px; border:0; cursor:pointer; }
+    .primary { background:#6a35ff; color:#fff; margin-bottom:10px; }
+    .log { margin-top:14px; font-size:13px; white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:12px; border:1px solid #eee; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>voice play · 결제 검증</h1>
+      <p>Pi App 검증 및 도메인 연결을 위한 최소 테스트 페이지입니다.</p>
+
+      <button class="primary" id="payBtn">0.01 Pi 결제 테스트</button>
+
+      <div class="log" id="log">대기 중…</div>
+    </div>
+  </div>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const log = (m) => logEl.textContent = m;
+
+    Pi.init({ version: "2.0" });
+
+    async function startPayment() {
+      try {
+        log("Pi 인증 중…");
+        await Pi.authenticate(["payments"], () => {});
+        log("결제 생성 중…");
+
+        Pi.createPayment(
+          {
+            amount: 0.01,
+            memo: "voice play verification",
+            metadata: { app: "voice-play" }
+          },
+          {
+            onReadyForServerApproval: async (paymentId) => {
+              log("서버 승인 요청 중…");
+              await fetch("/api/approve", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ paymentId })
+              });
+            },
+            onReadyForServerCompletion: async (paymentId, txid) => {
+              log("결제 완료 처리 중…");
+              await fetch("/api/complete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ paymentId, txid })
+              });
+              log("결제 완료 ✅");
+            },
+            onCancel: () => log("사용자가 결제를 취소했습니다."),
+            onError: (e) => log("에러: " + (e?.message || e))
+          }
+        );
+      } catch (e) {
+        log("실패: " + e);
+      }
+    }
+
+    document.getElementById("payBtn").addEventListener("click", startPayment);
+  </script>
+</body>
+</html>
