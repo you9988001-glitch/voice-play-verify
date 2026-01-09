@@ -49,8 +49,13 @@
     .center{text-align:center;margin:0 auto 48px}
     .center p{margin-bottom:34px;opacity:.75}
 
+    /* ✅ button text staying inside on mobile */
     .cta-btn{
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+
       padding:18px 56px;
       background:transparent;
       color:var(--pi-gold);
@@ -58,16 +63,28 @@
       font-weight:bold;
       border:1px solid var(--pi-gold);
       transition:.35s;
-      font-size:1.02rem;
+
+      font-size: clamp(.98rem, 3.6vw, 1.05rem);
+      letter-spacing: clamp(1px, .8vw, 3px);
+      line-height: 1.15;
+
       text-transform:uppercase;
-      letter-spacing:3px;
       cursor:pointer;
       border-radius:999px;
+
+      white-space: normal;
+      word-break: keep-all;
+      min-height: 54px;
     }
     .cta-btn:hover{
       background:var(--pi-gold);
       color:#000;
       box-shadow:0 0 40px rgba(255,165,0,.22);
+    }
+    .cta-btn[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
     }
 
     /* Application section (hidden until user chooses) */
@@ -145,7 +162,7 @@
       text-align:left;
     }
 
-    /* Success overlay */
+    /* Success banner */
     #success-banner{
       display:none;
       margin-top:18px;
@@ -206,8 +223,8 @@
     <section id="apply-section">
       <h3>Guardian Application</h3>
 
-      <!-- Formspree endpoint (no email exposure on page) -->
-      <form id="guardianForm" action="https://formspree.io/f/meeejjzp" method="POST">
+      <!-- ✅ No Formspree. Payment-gated serverless submission. -->
+      <form id="guardianForm">
         <div class="form-group">
           <label>Full Name</label>
           <input type="text" name="name" required />
@@ -234,7 +251,7 @@
         </div>
 
         <div class="row" style="margin-top:20px;">
-          <button class="cta-btn" type="submit" id="submitBtn">Submit Application</button>
+          <button class="cta-btn" type="submit" id="submitBtn" disabled>Submit Application</button>
           <button class="cta-btn" type="button" id="closeApplyBtn">Close</button>
         </div>
       </form>
@@ -253,6 +270,7 @@
     const logEl = document.getElementById("log");
     const successBanner = document.getElementById("success-banner");
     const formEl = document.getElementById("guardianForm");
+    const submitBtn = document.getElementById("submitBtn");
 
     const setLog = (m) => { logEl.textContent = m; };
 
@@ -269,18 +287,39 @@
     openApplyBtn.addEventListener("click", openForm);
     closeApplyBtn.addEventListener("click", closeForm);
 
-    // ===== Formspree: custom success + auto-close =====
+    // ===== Payment proof gate =====
+    let proofToken = null;
+    submitBtn.disabled = true;
+
+    function setVerifiedUI() {
+      submitBtn.disabled = false;
+      successBanner.style.display = "block";
+      successBanner.textContent = "Thank you, future Guardian.";
+    }
+
+    // ===== Form submit: /api/contact (payment required) =====
     formEl.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // Basic guard: allow submit even if user didn't pay (your choice).
-      // If you want "payment required before submit", tell me and I'll lock it.
+      if (!proofToken) {
+        setLog("Payment verification is required before submitting.");
+        return;
+      }
+
       try {
-        const formData = new FormData(formEl);
-        const r = await fetch(formEl.action, {
+        const fd = new FormData(formEl);
+        const payload = {
+          name: fd.get("name"),
+          email: fd.get("email"),
+          vision: fd.get("vision"),
+          proofToken
+        };
+
+        setLog("Submitting…");
+        const r = await fetch("/api/contact", {
           method: "POST",
-          body: formData,
-          headers: { "Accept": "application/json" }
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
 
         if (r.ok) {
@@ -289,18 +328,21 @@
           setLog("Application submitted successfully.");
           setTimeout(() => {
             formEl.reset();
+            submitBtn.disabled = true;
+            proofToken = null;
             successBanner.style.display = "none";
             closeForm();
           }, 1200);
         } else {
-          setLog("Application submission failed. Please try again.");
+          const err = await r.json().catch(() => ({}));
+          setLog("Submission failed: " + (err?.error || "Please try again."));
         }
       } catch (err) {
-        setLog("Application submission error: " + (err?.message || err));
+        setLog("Submission error: " + (err?.message || err));
       }
     });
 
-    // ===== Pi Payment (kept minimal + English only) =====
+    // ===== Pi Payment (English only in our UI) =====
     Pi.init({ version: "2.0" });
 
     async function startPayment() {
@@ -337,13 +379,15 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ paymentId, txid })
               });
-              if (!r.ok) {
-                const t = await r.text().catch(() => "");
-                throw new Error("Completion failed: " + r.status + " " + t);
+
+              const data = await r.json().catch(() => ({}));
+              if (!r.ok || !data?.proofToken) {
+                throw new Error("Completion failed.");
               }
-              successBanner.style.display = "block";
-              successBanner.textContent = "Thank you, future Guardian.";
-              setLog("Payment completed ✅");
+
+              proofToken = data.proofToken;
+              setVerifiedUI();
+              setLog("Payment completed ✅ You may submit your application.");
             },
 
             onCancel: () => setLog("Payment was cancelled by the user."),
