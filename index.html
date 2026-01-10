@@ -343,7 +343,10 @@
     });
 
     // ===== Pi Payment (English only in our UI) =====
-    Pi.init({ version: "2.0" });
+    Pi.init({ version: "2.0",
+  sandbox: true,
+  sandboxKey: "PMC9XAPR"
+ });
 
     async function startPayment() {
       try {
