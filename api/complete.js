@@ -1,71 +1,33 @@
-import crypto from "crypto";
+module.exports = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({ ok: false, error: "POST only" });
+    }
 
-function base64url(input) {
-  return Buffer.from(input)
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-}
+    const { paymentId, txid } = req.body || {};
+    if (!paymentId || !txid) {
+      return res.status(400).json({ ok: false, error: "Missing paymentId or txid" });
+    }
 
-function signJwtHS256(payload, secret) {
-  const header = { alg: "HS256", typ: "JWT" };
-  const encHeader = base64url(JSON.stringify(header));
-  const encPayload = base64url(JSON.stringify(payload));
-  const data = `${encHeader}.${encPayload}`;
-  const sig = crypto
-    .createHmac("sha256", secret)
-    .update(data)
-    .digest("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-  return `${data}.${sig}`;
-}
+    const apiKey = process.env.PI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ ok: false, error: "Missing PI_API_KEY env var" });
+    }
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "POST only" });
-  }
+    const url = `https://api.minepi.com/v2/payments/${paymentId}/complete`;
 
-  const { paymentId, txid } = req.body || {};
-  if (!paymentId || !txid) {
-    return res.status(400).json({ error: "missing params" });
-  }
-
-  const apiKey = process.env.PI_API_KEY;
-  const proofSecret = process.env.PROOF_TOKEN_SECRET;
-
-  if (!apiKey) return res.status(500).json({ error: "missing PI_API_KEY" });
-  if (!proofSecret) return res.status(500).json({ error: "missing PROOF_TOKEN_SECRET" });
-
-  const r = await fetch(
-    `https://api.minepi.com/v2/payments/${paymentId}/complete`,
-    {
+    const r = await fetch(url, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         "Authorization": `Key ${apiKey}`,
-        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ txid })
-    }
-  );
+      body: JSON.stringify({ txid }),
+    });
 
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) return res.status(r.status).json(data);
-
-  const now = Math.floor(Date.now() / 1000);
-  const proofToken = signJwtHS256(
-    {
-      iss: "code-arche",
-      typ: "pi-payment-proof",
-      paymentId,
-      txid,
-      iat: now,
-      exp: now + 15 * 60
-    },
-    proofSecret
-  );
-
-  return res.status(200).json({ ...data, proofToken });
-}
+    const data = await r.json().catch(() => ({}));
+    return res.status(r.status).json({ ok: r.ok, pi: data });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: String(e) });
+  }
+};
