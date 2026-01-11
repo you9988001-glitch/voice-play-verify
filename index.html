@@ -263,146 +263,134 @@
   </div>
 
   <script>
-    // ===== UI helpers =====
-    const applySection = document.getElementById("apply-section");
-    const openApplyBtn = document.getElementById("openApplyBtn");
-    const closeApplyBtn = document.getElementById("closeApplyBtn");
-    const logEl = document.getElementById("log");
-    const successBanner = document.getElementById("success-banner");
-    const formEl = document.getElementById("guardianForm");
-    const submitBtn = document.getElementById("submitBtn");
+const applySection = document.getElementById("apply-section");
+const openApplyBtn = document.getElementById("openApplyBtn");
+const closeApplyBtn = document.getElementById("closeApplyBtn");
+const logEl = document.getElementById("log");
+const successBanner = document.getElementById("success-banner");
+const formEl = document.getElementById("guardianForm");
+const submitBtn = document.getElementById("submitBtn");
 
-    const setLog = (m) => { logEl.textContent = m; };
+const setLog = (m) => { logEl.textContent = m; };
 
-    function openForm() {
-      applySection.style.display = "block";
-      applySection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+function openForm() {
+  applySection.style.display = "block";
+  applySection.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function closeForm() {
+  applySection.style.display = "none";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+openApplyBtn.onclick = openForm;
+closeApplyBtn.onclick = closeForm;
 
-    function closeForm() {
-      applySection.style.display = "none";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+let proofToken = null;
+submitBtn.disabled = true;
 
-    openApplyBtn.addEventListener("click", openForm);
-    closeApplyBtn.addEventListener("click", closeForm);
+function setVerifiedUI() {
+  submitBtn.disabled = false;
+  successBanner.style.display = "block";
+  successBanner.textContent = "Thank you, future Guardian.";
+}
 
-    // ===== Payment proof gate =====
-    let proofToken = null;
-    submitBtn.disabled = true;
+Pi.init({ version: "2.0" });
 
-    function setVerifiedUI() {
-      submitBtn.disabled = false;
-      successBanner.style.display = "block";
-      successBanner.textContent = "Thank you, future Guardian.";
-    }
+async function ensureAuth() {
+  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+}
+function onIncompletePaymentFound(payment) {
+  setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
+}
 
-    // ===== Form submit: /api/contact (payment required) =====
-    formEl.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      if (!proofToken) {
-        setLog("Payment verification is required before submitting.");
-        return;
-      }
-
-      try {
-        const fd = new FormData(formEl);
-        const payload = {
-          name: fd.get("name"),
-          email: fd.get("email"),
-          vision: fd.get("vision"),
-          proofToken
-        };
-
-        setLog("Submitting…");
-        const r = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        if (r.ok) {
-          successBanner.style.display = "block";
-          successBanner.textContent = "Thank you, future Guardian.";
-          setLog("Application submitted successfully.");
-          setTimeout(() => {
-            formEl.reset();
-            submitBtn.disabled = true;
-            proofToken = null;
-            successBanner.style.display = "none";
-            closeForm();
-          }, 1200);
-        } else {
-          const err = await r.json().catch(() => ({}));
-          setLog("Submission failed: " + (err?.error || "Please try again."));
-        }
-      } catch (err) {
-        setLog("Submission error: " + (err?.message || err));
-      }
-    });
-
-    // ===== Pi Payment (English only in our UI) =====
-    Pi.init({ version: "2.0",
-  sandbox: true,
- });
-
-    async function startPayment() {
+async function startPayment() {
   try {
-    setLog("Authenticating with Pi…");
+    setLog("Pi 인증 중…");
+    await ensureAuth();
 
-    // ✅ 1번만 호출 + pending 결제 발견 시 안내
-    await Pi.authenticate(["payments"], (payment) => {
-      // 결제가 미완료로 남아있을 때 여기로 들어올 수 있어
-      setLog("Found an incomplete payment. Please cancel/complete it, then try again.");
-    });
-
-    setLog("Creating payment…");
+    setLog("결제 생성 중…");
 
     Pi.createPayment(
       {
         amount: 0.01,
-        memo: "voice play verification",
-        metadata: { app: "voice-play" }
+        memo: "Code Arche Guardian verification",
+        metadata: { app: "code-arche" },
       },
       {
         onReadyForServerApproval: async (paymentId) => {
-          setLog("Requesting server approval…");
+          setLog("서버 승인 요청 중…");
           const r = await fetch("/api/approve", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentId })
+            body: JSON.stringify({ paymentId }),
           });
-          if (!r.ok) throw new Error("Approval failed: " + r.status);
-          setLog("Approved. Waiting for completion…");
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error("approve failed: " + JSON.stringify(j));
+          setLog("서버 승인 완료 ✅");
         },
 
         onReadyForServerCompletion: async (paymentId, txid) => {
-          setLog("Completing payment…");
+          setLog("서버 완료 요청 중…");
           const r = await fetch("/api/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentId, txid })
+            body: JSON.stringify({ paymentId, txid }),
           });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error("complete failed: " + JSON.stringify(j));
 
-          const data = await r.json().catch(() => ({}));
-          if (!r.ok || !data?.proofToken) throw new Error("Completion failed.");
-
-          proofToken = data.proofToken;
+          proofToken = j.proofToken || "ok";
           setVerifiedUI();
-          setLog("Payment completed ✅ You may submit your application.");
+          setLog("결제 완료 ✅ 이제 제출 가능");
         },
 
-        onCancel: () => setLog("Payment was cancelled by the user."),
-        onError: (e) => setLog("Payment error: " + (e?.message || e))
+        onCancel: () => setLog("사용자가 결제를 취소했습니다."),
+        onError: (e) => setLog("결제 오류: " + (e?.message || e)),
       }
     );
   } catch (e) {
-    setLog("Payment failed: " + (e?.message || e));
+    setLog("초기화 실패: " + String(e));
   }
 }
 
-    document.getElementById("payBtn").addEventListener("click", startPayment);
-  </script>
+document.getElementById("payBtn").onclick = startPayment;
+
+formEl.onsubmit = async (e) => {
+  e.preventDefault();
+  if (!proofToken) {
+    setLog("먼저 결제를 완료해야 합니다.");
+    return;
+  }
+
+  const fd = new FormData(formEl);
+  const payload = {
+    name: fd.get("name"),
+    email: fd.get("email"),
+    vision: fd.get("vision"),
+    proofToken,
+  };
+
+  setLog("제출 중…");
+  const r = await fetch("/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (r.ok) {
+    setLog("신청 완료 🎉");
+    setTimeout(() => {
+      formEl.reset();
+      submitBtn.disabled = true;
+      proofToken = null;
+      successBanner.style.display = "none";
+      closeForm();
+    }, 1200);
+  } else {
+    const err = await r.json().catch(() => ({}));
+    setLog("제출 실패: " + (err?.error || "unknown"));
+  }
+};
+</script>
+
 </body>
 </html>
