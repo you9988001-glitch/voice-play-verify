@@ -349,59 +349,59 @@
  });
 
     async function startPayment() {
-      try {
-        setLog("Authenticating with Pi…");
-        await Pi.authenticate(["payments"], () => {});
-        setLog("Creating payment…");
-        await Pi.authenticate(["payments"], () => {});
+  try {
+    setLog("Authenticating with Pi…");
 
-        Pi.createPayment(
-          {
-            amount: 0.01,
-            memo: "voice play verification",
-            metadata: { app: "voice-play" }
-          },
-          {
-            onReadyForServerApproval: async (paymentId) => {
-              setLog("Requesting server approval…");
-              const r = await fetch("/api/approve", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ paymentId })
-              });
-              if (!r.ok) {
-                const t = await r.text().catch(() => "");
-                throw new Error("Approval failed: " + r.status + " " + t);
-              }
-              setLog("Approved. Waiting for completion…");
-            },
+    // ✅ 1번만 호출 + pending 결제 발견 시 안내
+    await Pi.authenticate(["payments"], (payment) => {
+      // 결제가 미완료로 남아있을 때 여기로 들어올 수 있어
+      setLog("Found an incomplete payment. Please cancel/complete it, then try again.");
+    });
 
-            onReadyForServerCompletion: async (paymentId, txid) => {
-              setLog("Completing payment…");
-              const r = await fetch("/api/complete", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ paymentId, txid })
-              });
+    setLog("Creating payment…");
 
-              const data = await r.json().catch(() => ({}));
-              if (!r.ok || !data?.proofToken) {
-                throw new Error("Completion failed.");
-              }
+    Pi.createPayment(
+      {
+        amount: 0.01,
+        memo: "voice play verification",
+        metadata: { app: "voice-play" }
+      },
+      {
+        onReadyForServerApproval: async (paymentId) => {
+          setLog("Requesting server approval…");
+          const r = await fetch("/api/approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentId })
+          });
+          if (!r.ok) throw new Error("Approval failed: " + r.status);
+          setLog("Approved. Waiting for completion…");
+        },
 
-              proofToken = data.proofToken;
-              setVerifiedUI();
-              setLog("Payment completed ✅ You may submit your application.");
-            },
+        onReadyForServerCompletion: async (paymentId, txid) => {
+          setLog("Completing payment…");
+          const r = await fetch("/api/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentId, txid })
+          });
 
-            onCancel: () => setLog("Payment was cancelled by the user."),
-            onError: (e) => setLog("Payment error: " + (e?.message || e))
-          }
-        );
-      } catch (e) {
-        setLog("Payment failed: " + (e?.message || e));
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok || !data?.proofToken) throw new Error("Completion failed.");
+
+          proofToken = data.proofToken;
+          setVerifiedUI();
+          setLog("Payment completed ✅ You may submit your application.");
+        },
+
+        onCancel: () => setLog("Payment was cancelled by the user."),
+        onError: (e) => setLog("Payment error: " + (e?.message || e))
       }
-    }
+    );
+  } catch (e) {
+    setLog("Payment failed: " + (e?.message || e));
+  }
+}
 
     document.getElementById("payBtn").addEventListener("click", startPayment);
   </script>
