@@ -49,7 +49,6 @@
     .center{text-align:center;margin:0 auto 48px}
     .center p{margin-bottom:34px;opacity:.75}
 
-    /* ✅ button text staying inside on mobile */
     .cta-btn{
       display:inline-flex;
       align-items:center;
@@ -175,6 +174,33 @@
       letter-spacing:1px;
     }
 
+    /* ✅ GATEWAY BAR (Close 아래 관문) */
+    .gateway-wrap{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.08);
+      text-align:center;
+    }
+    .gateway-sub{
+      opacity:.65;
+      letter-spacing:2px;
+      font-size:.9rem;
+      margin-bottom:12px;
+    }
+    .gateway-btn{
+      width:100%;
+      border-radius:14px;
+      padding:18px 22px;
+      border:1px solid rgba(255,165,0,.55);
+      background:rgba(255,165,0,.06);
+      color:var(--pi-gold);
+      letter-spacing:6px;
+    }
+    .gateway-btn:hover{
+      background:rgba(255,165,0,.18);
+      box-shadow:0 0 40px rgba(255,165,0,.16);
+    }
+
     footer{text-align:center;padding:90px 0 20px;font-size:.78rem;opacity:.45;letter-spacing:2px}
     a{color:inherit}
   </style>
@@ -223,7 +249,6 @@
     <section id="apply-section">
       <h3>Guardian Application</h3>
 
-      <!-- ✅ No Formspree. Payment-gated serverless submission. -->
       <form id="guardianForm">
         <div class="form-group">
           <label>Full Name</label>
@@ -254,6 +279,14 @@
           <button class="cta-btn" type="submit" id="submitBtn" disabled>Submit Application</button>
           <button class="cta-btn" type="button" id="closeApplyBtn">Close</button>
         </div>
+
+        <!-- ✅ Close 밑 “다음 관문” -->
+        <div class="gateway-wrap">
+          <div class="gateway-sub">NEXT GATE</div>
+          <button class="cta-btn gateway-btn" type="button" id="goGenesisBtn" disabled>
+            ENTER PI GENESIS
+          </button>
+        </div>
       </form>
     </section>
 
@@ -270,6 +303,7 @@ const logEl = document.getElementById("log");
 const successBanner = document.getElementById("success-banner");
 const formEl = document.getElementById("guardianForm");
 const submitBtn = document.getElementById("submitBtn");
+const goGenesisBtn = document.getElementById("goGenesisBtn");
 
 const setLog = (m) => { logEl.textContent = m; };
 
@@ -284,8 +318,14 @@ function closeForm() {
 openApplyBtn.onclick = openForm;
 closeApplyBtn.onclick = closeForm;
 
+// ✅ 관문 이동 (같은 배포 안에 /pi-genesis.html 두는 방식)
+goGenesisBtn.onclick = () => {
+  window.location.href = "/pi-genesis.html";
+};
+
 let proofToken = null;
 submitBtn.disabled = true;
+goGenesisBtn.disabled = true; // ✅ 기본 잠금
 
 function setVerifiedUI() {
   submitBtn.disabled = false;
@@ -378,7 +418,14 @@ formEl.onsubmit = async (e) => {
 
   if (r.ok) {
     setLog("신청 완료 🎉");
+
+    // ✅ 여기서 “다음 관문” 오픈 (원하는 연출 포인트)
+    goGenesisBtn.disabled = false;
+    goGenesisBtn.textContent = "ENTER PI GENESIS";
+
+    // 기존 흐름 유지(원하면 reset/close는 빼도 됨)
     setTimeout(() => {
+      // 폼을 리셋해도 관문은 열어둔다 (원하면 다시 잠그게도 가능)
       formEl.reset();
       submitBtn.disabled = true;
       proofToken = null;
@@ -393,4 +440,4 @@ formEl.onsubmit = async (e) => {
 </script>
 
 </body>
-</html>   
+</html>
