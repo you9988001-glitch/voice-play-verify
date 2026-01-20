@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Genesis | CODE ARCHE</title>
+    <style>
+        :root {
+            --nexus-gold: #ffcc33;
+            --deep-void: #050505;
+            --stellar-white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        
+        body { 
+            background-color: var(--deep-void); 
+            color: var(--stellar-white); 
+            font-family: 'Cinzel', serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .nexus-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at center, #1a1a2e 0%, var(--deep-void) 80%),
+                url('https://www.transparenttextures.com/patterns/stardust.png');
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(40px, 8vw, 120px);
+            max-width: 1600px;
+            width: 100%;
+        }
+
+        .portal-rings {
+            position: relative;
+            width: clamp(280px, 50vw, 550px);
+            height: clamp(280px, 50vw, 550px);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .star-core {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 
+                0 0 4px rgba(255,255,255,0.1),
+                0 0 8px rgba(255,204,51,0.08);
+            transform: scale(0.7);
+            opacity: 0.12;
+            animation: starPulse 36s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            z-index: 5;
+        }
+
+        .light-layer {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,204,51,0.4) 0%, transparent 70%);
+            transform: scale(0.85);
+            opacity: 0.2;
+        }
+
+        .layer-1 {
+            width: 60px;
+            height: 60px;
+            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            animation-delay: 0s;
+        }
+
+        .layer-2 {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,204,51,0.3) 0%, transparent 70%);
+            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            animation-delay: 0.6s;
+        }
+
+        .layer-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,204,51,0.2) 0%, transparent 70%);
+            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            animation-delay: 1.2s;
+        }
+
+        .layer-4 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,204,51,0.15) 0%, transparent 70%);
+            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            animation-delay: 1.8s;
+        }
+
+        .portal-core {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,204,51,0.12) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            animation-delay: 2.4s;
+        }
+
+        .ring {
+            position: absolute;
+            border: 1px solid rgba(255, 204, 51, 0.25);
+            border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+            animation: rotate 20s infinite linear;
+        }
+
+        .ring-1 { 
+            width: 100%; 
+            height: 100%; 
+            animation-duration: 35s;
+        }
+        
+        .ring-2 { 
+            width: 80%; 
+            height: 80%; 
+            animation-duration: 28s; 
+            animation-direction: reverse;
+        }
+        
+        .ring-3 { 
+            width: 60%; 
+            height: 60%; 
+            animation-duration: 45s; 
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .content {
+            text-align: center;
+            max-width: 600px;
+            flex-shrink: 1;
+        }
+
+        .arche-prefix {
+            font-size: clamp(0.63rem, 1.26vw, 0.7875rem);
+            letter-spacing: clamp(8px, 1.8vw, 14px);
+            color: var(--nexus-gold);
+            text-transform: uppercase;
+            margin-bottom: clamp(15px, 3vw, 25px);
+            opacity: 0.5;
+            animation: fadeIn 3s ease-out;
+        }
+
+        .main-heading {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 200;
+            letter-spacing: clamp(6px, 1.5vw, 12px);
+            text-transform: uppercase;
+            margin-bottom: clamp(20px, 4vw, 35px);
+            background: linear-gradient(to bottom, #ffffff 40%, var(--nexus-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideUp 2.5s ease-out;
+            line-height: 1.2;
+        }
+
+        .manifesto {
+            font-size: clamp(0.945rem, 1.89vw, 1.1025rem);
+            line-height: 1.9;
+            color: #999;
+            letter-spacing: clamp(2px, 0.6vw, 4px);
+            font-weight: 300;
+            margin-bottom: clamp(40px, 6vw, 60px);
+            padding: 0 clamp(10px, 3vw, 50px);
+            animation: fadeIn 5s ease-in;
+        }
+
+        .manifesto b { 
+            color: #fff; 
+            font-weight: 300; 
+            font-style: italic; 
+        }
+
+        .enter-ritual {
+            padding: clamp(14px, 2.5vw, 20px) clamp(40px, 6vw, 60px);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: clamp(4px, 1vw, 8px);
+            font-size: clamp(0.65rem, 1.2vw, 0.75rem);
+            cursor: pointer;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .enter-ritual:hover {
+            border-color: var(--nexus-gold);
+            color: var(--nexus-gold);
+            background: rgba(255, 204, 51, 0.03);
+            box-shadow: 0 0 60px rgba(255, 204, 51, 0.08);
+            letter-spacing: clamp(6px, 1.3vw, 10px);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes starPulse {
+            0% { 
+                transform: scale(0.7);
+                opacity: 0.12;
+                box-shadow: 
+                    0 0 3px rgba(255,255,255,0.08),
+                    0 0 6px rgba(255,204,51,0.06);
+            }
+            35% { 
+                transform: scale(0.75);
+                opacity: 0.18;
+                box-shadow: 
+                    0 0 4px rgba(255,255,255,0.12),
+                    0 0 8px rgba(255,204,51,0.1);
+            }
+            45%, 70% { 
+                transform: scale(2.57);
+                opacity: 1;
+                box-shadow: 
+                    0 0 55px rgba(255,255,255,0.95),
+                    0 0 110px var(--nexus-gold),
+                    0 0 165px rgba(255,204,51,0.8);
+            }
+            95% {
+                transform: scale(0.75);
+                opacity: 0.18;
+                box-shadow: 
+                    0 0 4px rgba(255,255,255,0.12),
+                    0 0 8px rgba(255,204,51,0.1);
+            }
+            100% {
+                transform: scale(0.7);
+                opacity: 0.12;
+                box-shadow: 
+                    0 0 3px rgba(255,255,255,0.08),
+                    0 0 6px rgba(255,204,51,0.06);
+            }
+        }
+
+        @keyframes expandPulse {
+            0% { 
+                transform: scale(0.85);
+                opacity: 0.2;
+            }
+            45%, 70% { 
+                transform: scale(1.65);
+                opacity: 0.8;
+            }
+            95% { 
+                transform: scale(0.85);
+                opacity: 0.2;
+            }
+            100% { 
+                transform: scale(0.85);
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                gap: clamp(30px, 6vh, 60px);
+            }
+            
+            .portal-rings {
+                width: clamp(275px, 66vw, 440px);
+                height: clamp(275px, 66vw, 440px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            html { font-size: 14px; }
+            
+            body { 
+                padding: 15px;
+            }
+            
+            .portal-rings {
+                width: clamp(242px, 77vw, 352px);
+                height: clamp(242px, 77vw, 352px);
+            }
+
+            .ring {
+                border-width: 0.8px;
+            }
+
+            .portal-core {
+                filter: blur(30px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nexus-bg"></div>
+    
+    <div class="container">
+        <div class="portal-rings">
+            <div class="star-core"></div>
+            <div class="light-layer layer-1"></div>
+            <div class="light-layer layer-2"></div>
+            <div class="light-layer layer-3"></div>
+            <div class="light-layer layer-4"></div>
+            <div class="portal-core"></div>
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+
+        <div class="content">
+            <div class="arche-prefix">Universal Origin</div>
+            <h1 class="main-heading">Pi Genesis</h1>
+            <p class="manifesto">
+                beyond the boundaries of a single world,<br>
+                a <b>great confluence</b> is emerging.<br>
+                countless paths are converging into one sacred point,<br>
+                preparing to redefine the <b>fabric of reality</b>.
+            </p>
+            <button class="enter-ritual">Wait for the Alignment</button>
+        </div>
+    </div>
+</body>
+</html>
