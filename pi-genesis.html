@@ -46,8 +46,8 @@
 
         .portal-rings {
             position: relative;
-            width: clamp(280px, 50vw, 550px);
-            height: clamp(280px, 50vw, 550px);
+            width: clamp(294px, 52.5vw, 577.5px);
+            height: clamp(294px, 52.5vw, 577.5px);
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -202,6 +202,17 @@
             font-size: clamp(0.65rem, 1.2vw, 0.75rem);
             cursor: pointer;
             transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 30px;
+        }
+
+        .signature {
+            font-family: 'Brush Script MT', cursive;
+            font-size: clamp(0.85rem, 1.4vw, 1rem);
+            color: #ff9966;
+            opacity: 0.75;
+            font-style: italic;
+            letter-spacing: 1px;
+            animation: fadeIn 6s ease-in;
         }
 
         .enter-ritual:hover {
@@ -222,37 +233,37 @@
                 transform: scale(0.7);
                 opacity: 0.12;
                 box-shadow: 
-                    0 0 3px rgba(255,255,255,0.08),
-                    0 0 6px rgba(255,204,51,0.06);
+                    0 0 3.3px rgba(255,255,255,0.08),
+                    0 0 6.6px rgba(255,204,51,0.06);
             }
             35% { 
                 transform: scale(0.75);
                 opacity: 0.18;
                 box-shadow: 
-                    0 0 4px rgba(255,255,255,0.12),
-                    0 0 8px rgba(255,204,51,0.1);
+                    0 0 4.4px rgba(255,255,255,0.12),
+                    0 0 8.8px rgba(255,204,51,0.1);
             }
-            45%, 70% { 
+            45%, 83% { 
                 transform: scale(2.57);
                 opacity: 1;
                 box-shadow: 
-                    0 0 55px rgba(255,255,255,0.95),
-                    0 0 110px var(--nexus-gold),
-                    0 0 165px rgba(255,204,51,0.8);
+                    0 0 60.5px rgba(255,255,255,0.95),
+                    0 0 121px var(--nexus-gold),
+                    0 0 181.5px rgba(255,204,51,0.8);
             }
             95% {
                 transform: scale(0.75);
                 opacity: 0.18;
                 box-shadow: 
-                    0 0 4px rgba(255,255,255,0.12),
-                    0 0 8px rgba(255,204,51,0.1);
+                    0 0 4.4px rgba(255,255,255,0.12),
+                    0 0 8.8px rgba(255,204,51,0.1);
             }
             100% {
                 transform: scale(0.7);
                 opacity: 0.12;
                 box-shadow: 
-                    0 0 3px rgba(255,255,255,0.08),
-                    0 0 6px rgba(255,204,51,0.06);
+                    0 0 3.3px rgba(255,255,255,0.08),
+                    0 0 6.6px rgba(255,204,51,0.06);
             }
         }
 
@@ -261,7 +272,7 @@
                 transform: scale(0.85);
                 opacity: 0.2;
             }
-            45%, 70% { 
+            45%, 83% { 
                 transform: scale(1.65);
                 opacity: 0.8;
             }
@@ -317,6 +328,12 @@
                 filter: blur(30px);
             }
         }
+/* ===== PC에서만 Pi Genesis 한 줄 유지 ===== */
+@media (min-width: 1200px) {
+  .main-heading {
+    white-space: nowrap;
+  }
+}
     </style>
 </head>
 <body>
@@ -345,6 +362,7 @@
                 preparing to redefine the <b>fabric of reality</b>.
             </p>
             <button class="enter-ritual">Wait for the Alignment</button>
+            <div class="signature">Patience by Archeon THIA</div>
         </div>
     </div>
 </body>
