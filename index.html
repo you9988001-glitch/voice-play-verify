@@ -8,51 +8,6 @@
   <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-  <!-- ✅ COPYRIGHT PROTECTION STYLES -->
-  <style id="copyright-protect-styles">
-    /* 우클릭 방지 시각적 피드백 */
-    .no-copy-overlay {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 165, 0, 0.95);
-      color: #000;
-      padding: 20px 40px;
-      border-radius: 12px;
-      font-weight: bold;
-      z-index: 99999;
-      display: none;
-      pointer-events: none;
-      box-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
-    }
-    
-    /* 텍스트 선택 방지 */
-    .protected-content {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-    }
-    
-    /* 개발자도구 감지 경고 */
-    .devtools-warning {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(255, 0, 0, 0.9);
-      color: white;
-      text-align: center;
-      padding: 15px;
-      z-index: 99998;
-      display: none;
-      font-weight: bold;
-      letter-spacing: 2px;
-    }
-  </style>
-
   <style>
     :root{
       --pi-gold:#ffa500;
@@ -62,7 +17,27 @@
       --border: rgba(255,165,0,0.35);
     }
     *{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif;scroll-behavior:smooth}
-    body{background:var(--arche-dark);color:var(--arche-white);line-height:1.8;overflow-x:hidden}
+    
+    /* ✅ 텍스트 선택 방지 */
+    body{
+      background:var(--arche-dark);
+      color:var(--arche-white);
+      line-height:1.8;
+      overflow-x:hidden;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    /* 입력 필드는 선택 가능하게 */
+    input, textarea {
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      user-select: text !important;
+    }
+    
     .bg-overlay{
       position:fixed;inset:0;
       background:radial-gradient(circle at center,#1e0b36 0%,#0f0f0f 100%);
@@ -242,17 +217,60 @@
       box-shadow:0 0 40px rgba(255,165,0,.16);
     }
 
+    /* ✅ 저작권 보호 UI */
+    #copyright-overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 165, 0, 0.95);
+      color: #000;
+      padding: 20px 40px;
+      border-radius: 12px;
+      font-weight: bold;
+      z-index: 99999;
+      display: none;
+      pointer-events: none;
+      box-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+    }
+    
+    #devtools-warning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 0, 0, 0.9);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      z-index: 99998;
+      display: none;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    
+    #watermark {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 10px;
+      color: rgba(255, 165, 0, 0.3);
+      pointer-events: none;
+      z-index: 9999;
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+
     footer{text-align:center;padding:90px 0 20px;font-size:.78rem;opacity:.45;letter-spacing:2px}
     a{color:inherit}
   </style>
 </head>
 
-<body class="protected-content">
-  <!-- ✅ COPYRIGHT PROTECTION UI ELEMENTS -->
-  <div class="no-copy-overlay" id="noCopyOverlay">⚠️ This content is protected by CODE ARCHE</div>
-  <div class="devtools-warning" id="devtoolsWarning">
-    ⚠️ Developer tools detected - This content is protected by copyright
-  </div>
+<body>
+  <!-- ✅ 저작권 보호 UI 요소 -->
+  <div id="copyright-overlay">⚠️ This content is protected by CODE ARCHE</div>
+  <div id="devtools-warning">⚠️ Developer tools detected - This content is protected by copyright</div>
+  <div id="watermark">© CODE ARCHE</div>
 
   <div class="bg-overlay"></div>
 
@@ -341,197 +359,110 @@
     </footer>
   </div>
 
-  <!-- ✅ COPYRIGHT PROTECTION SCRIPT - 이 부분을 맨 위에 배치 -->
+  <!-- ========================================
+       ✅ 저작권 보호 스크립트 (파일 추가 불필요)
+       ======================================== -->
   <script>
 (function() {
   'use strict';
   
-  // ========================================
-  // 1. 우클릭 방지
-  // ========================================
+  // 우클릭 방지
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
-    showProtectionMessage();
+    showMessage();
     return false;
-  }, false);
-
-  // ========================================
-  // 2. 키보드 단축키 방지
-  // ========================================
+  });
+  
+  // 개발자도구 단축키 방지
   document.addEventListener('keydown', function(e) {
-    // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U 방지
     if (
       e.keyCode === 123 || // F12
       (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
       (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
       (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
       (e.ctrlKey && e.shiftKey && e.keyCode === 67) || // Ctrl+Shift+C
-      (e.metaKey && e.altKey && e.keyCode === 73) || // Mac: Cmd+Option+I
-      (e.metaKey && e.altKey && e.keyCode === 74) // Mac: Cmd+Option+J
+      (e.metaKey && e.altKey && e.keyCode === 73) || // Mac Cmd+Opt+I
+      (e.metaKey && e.altKey && e.keyCode === 74) || // Mac Cmd+Opt+J
+      (e.ctrlKey && e.keyCode === 83) || // Ctrl+S
+      (e.ctrlKey && e.keyCode === 65) // Ctrl+A
     ) {
       e.preventDefault();
-      showProtectionMessage();
+      showMessage();
       return false;
     }
-    
-    // Ctrl+S 저장 방지
-    if (e.ctrlKey && e.keyCode === 83) {
-      e.preventDefault();
-      showProtectionMessage();
-      return false;
-    }
-    
-    // Ctrl+A 전체 선택 방지 (선택적)
-    if (e.ctrlKey && e.keyCode === 65) {
-      e.preventDefault();
-      showProtectionMessage();
-      return false;
-    }
-  }, false);
-
-  // ========================================
-  // 3. 복사/붙여넣기 방지
-  // ========================================
+  });
+  
+  // 복사/붙여넣기 방지
   document.addEventListener('copy', function(e) {
     e.preventDefault();
-    showProtectionMessage();
+    showMessage();
     return false;
-  }, false);
-
+  });
+  
   document.addEventListener('cut', function(e) {
     e.preventDefault();
-    showProtectionMessage();
+    showMessage();
     return false;
-  }, false);
-
-  // ========================================
-  // 4. 드래그 방지
-  // ========================================
+  });
+  
+  // 드래그 방지
   document.addEventListener('dragstart', function(e) {
     e.preventDefault();
     return false;
-  }, false);
-
-  // ========================================
-  // 5. 개발자 도구 감지
-  // ========================================
-  let devtoolsOpen = false;
-  const threshold = 160;
-
-  function detectDevTools() {
-    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+  });
+  
+  // 개발자도구 감지
+  let devOpen = false;
+  setInterval(function() {
+    const threshold = 160;
+    const widthCheck = window.outerWidth - window.innerWidth > threshold;
+    const heightCheck = window.outerHeight - window.innerHeight > threshold;
     
-    if (widthThreshold || heightThreshold) {
-      if (!devtoolsOpen) {
-        devtoolsOpen = true;
-        showDevToolsWarning();
+    if (widthCheck || heightCheck) {
+      if (!devOpen) {
+        devOpen = true;
+        document.getElementById('devtools-warning').style.display = 'block';
       }
     } else {
-      if (devtoolsOpen) {
-        devtoolsOpen = false;
-        hideDevToolsWarning();
+      if (devOpen) {
+        devOpen = false;
+        document.getElementById('devtools-warning').style.display = 'none';
       }
     }
-  }
-
-  // 주기적으로 체크
-  setInterval(detectDevTools, 1000);
-
-  // ========================================
-  // 6. 소스 보기 방지 (View Source)
-  // ========================================
-  document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.keyCode === 85) {
-      e.preventDefault();
-      showProtectionMessage();
-      return false;
-    }
-  }, false);
-
-  // ========================================
-  // 7. 콘솔 경고 메시지
-  // ========================================
-  console.log('%c⚠️ WARNING', 'color: red; font-size: 40px; font-weight: bold;');
-  console.log('%cThis is a protected CODE ARCHE project.', 'color: orange; font-size: 20px;');
-  console.log('%cUnauthorized access or copying is prohibited.', 'color: orange; font-size: 16px;');
-  console.log('%c© 2026 CODE ARCHE. All Rights Reserved.', 'color: #ffa500; font-size: 14px;');
-
-  // ========================================
-  // 8. 워터마크 추가 (선택적)
-  // ========================================
-  function addWatermark() {
-    const watermark = document.createElement('div');
-    watermark.innerHTML = '© CODE ARCHE';
-    watermark.style.cssText = `
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 10px;
-      color: rgba(255, 165, 0, 0.3);
-      pointer-events: none;
-      z-index: 9999;
-      font-family: monospace;
-      letter-spacing: 2px;
-    `;
-    document.body.appendChild(watermark);
-  }
-
-  // ========================================
-  // UI 헬퍼 함수들
-  // ========================================
-  function showProtectionMessage() {
-    const overlay = document.getElementById('noCopyOverlay');
-    if (overlay) {
-      overlay.style.display = 'block';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-      }, 2000);
-    }
-  }
-
-  function showDevToolsWarning() {
-    const warning = document.getElementById('devtoolsWarning');
-    if (warning) {
-      warning.style.display = 'block';
-    }
-  }
-
-  function hideDevToolsWarning() {
-    const warning = document.getElementById('devtoolsWarning');
-    if (warning) {
-      warning.style.display = 'none';
-    }
-  }
-
-  // ========================================
-  // 페이지 로드 시 초기화
-  // ========================================
-  window.addEventListener('load', function() {
-    addWatermark();
-    detectDevTools();
-  });
-
-  // ========================================
-  // 9. 인쇄 방지 (선택적)
-  // ========================================
+  }, 1000);
+  
+  // 인쇄 방지
   window.addEventListener('beforeprint', function(e) {
     e.preventDefault();
     alert('Printing is disabled for this protected content.');
     return false;
   });
-
-  // ========================================
-  // 10. iframe 삽입 방지
-  // ========================================
+  
+  // iframe 방지
   if (window.top !== window.self) {
     window.top.location = window.self.location;
   }
-
+  
+  // 콘솔 경고
+  console.clear();
+  console.log('%c⚠️ WARNING', 'color: red; font-size: 40px; font-weight: bold;');
+  console.log('%cThis is a protected CODE ARCHE project.', 'color: orange; font-size: 20px;');
+  console.log('%c© 2026 CODE ARCHE. All Rights Reserved.', 'color: #ffa500; font-size: 14px;');
+  
+  // 보호 메시지 표시
+  function showMessage() {
+    const overlay = document.getElementById('copyright-overlay');
+    overlay.style.display = 'block';
+    setTimeout(function() {
+      overlay.style.display = 'none';
+    }, 2000);
+  }
 })();
   </script>
 
-  <!-- ✅ 기존 기능 스크립트 -->
+  <!-- ========================================
+       기존 기능 스크립트
+       ======================================== -->
   <script>
 const applySection = document.getElementById("apply-section");
 const openApplyBtn = document.getElementById("openApplyBtn");
