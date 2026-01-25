@@ -392,92 +392,39 @@ body {
             <button class="enter-ritual">Wait for the Alignment</button>
             <div class="signature">Patience by Archeon THIA</div>
         </div>
-  <!-- ========================================
-     ✅ 저작권 보호 스크립트
-     ======================================== -->
-<script>
+  <script>
 (function() {
   'use strict';
   
-  // 우클릭 방지
+  // 우클릭 차단
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
-    alert('⚠️ This content is protected by CODE ARCHE');
     return false;
   });
   
-  // 개발자도구 단축키 방지 (F12, Ctrl+Shift+I 등)
+  // F12, Ctrl+Shift+I, Ctrl+U 차단
   document.addEventListener('keydown', function(e) {
-    if (
-      e.keyCode === 123 || 
-      (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
-      (e.ctrlKey && e.shiftKey && e.keyCode === 74) || 
-      (e.ctrlKey && e.keyCode === 85) || 
-      (e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
-      (e.metaKey && e.altKey && e.keyCode === 73) || 
-      (e.metaKey && e.altKey && e.keyCode === 74) || 
-      (e.ctrlKey && e.keyCode === 83) || 
-      (e.ctrlKey && e.keyCode === 65)
-    ) {
+    if (e.keyCode === 123 || 
+        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+        (e.ctrlKey && e.keyCode === 85)) {
       e.preventDefault();
-      alert('⚠️ This content is protected by CODE ARCHE');
       return false;
     }
   });
   
-  // 복사/붙여넣기 방지
+  // 복사 차단
   document.addEventListener('copy', function(e) {
     e.preventDefault();
-    alert('⚠️ This content is protected by CODE ARCHE');
     return false;
   });
   
-  document.addEventListener('cut', function(e) {
-    e.preventDefault();
-    return false;
-  });
-  
-  // 드래그 방지
+  // 드래그 차단
   document.addEventListener('dragstart', function(e) {
     e.preventDefault();
     return false;
   });
   
-  // 개발자도구 감지
-  let devOpen = false;
-  setInterval(function() {
-    const threshold = 160;
-    const widthCheck = window.outerWidth - window.innerWidth > threshold;
-    const heightCheck = window.outerHeight - window.innerHeight > threshold;
-    
-    if (widthCheck || heightCheck) {
-      if (!devOpen) {
-        devOpen = true;
-        console.log('%c⚠️ Developer tools detected', 'color: red; font-size: 20px;');
-      }
-    } else {
-      devOpen = false;
-    }
-  }, 1000);
-  
-  // 인쇄 방지
-  window.addEventListener('beforeprint', function(e) {
-    e.preventDefault();
-    alert('Printing is disabled for this protected content.');
-    return false;
-  });
-  
-  // iframe 방지
-  if (window.top !== window.self) {
-    window.top.location = window.self.location;
-  }
-  
-  // 콘솔 경고
-  console.clear();
-  console.log('%c⚠️ WARNING', 'color: red; font-size: 40px; font-weight: bold;');
-  console.log('%cThis is a protected CODE ARCHE project.', 'color: orange; font-size: 20px;');
-  console.log('%c© 2026 CODE ARCHE. All Rights Reserved.', 'color: #ffa500; font-size: 14px;');
-   // 워터마크 추가
+  // 워터마크 추가
   window.addEventListener('load', function() {
     const watermark = document.createElement('div');
     watermark.textContent = '© CODE ARCHE';
@@ -494,6 +441,9 @@ body {
     `;
     document.body.appendChild(watermark);
   });
+  
+})();
+</script>
 })();
 </script>   
 </body>
