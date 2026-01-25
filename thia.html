@@ -553,5 +553,59 @@
             portal.appendChild(thread);
         }
     </script>
+
+    <script>
+(function() {
+  'use strict';
+  
+  // 우클릭 차단
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  
+  // F12, Ctrl+Shift+I, Ctrl+U 차단
+  document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 123 || 
+        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+        (e.ctrlKey && e.keyCode === 85)) {
+      e.preventDefault();
+      return false;
+    }
+  });
+  
+  // 복사 차단
+  document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  
+  // 드래그 차단
+  document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  
+  // 워터마크 추가
+  window.addEventListener('load', function() {
+    const watermark = document.createElement('div');
+    watermark.textContent = '© CODE ARCHE';
+    watermark.style.cssText = `
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 10px;
+      color: rgba(255, 165, 0, 0.3);
+      pointer-events: none;
+      z-index: 9999;
+      font-family: monospace;
+      letter-spacing: 2px;
+    `;
+    document.body.appendChild(watermark);
+  });
+  
+})();
+</script>
+
 </body>
 </html>
