@@ -281,7 +281,7 @@
         }
 
         @keyframes colorShift {
-            0%, 95% { 
+            0% { 
                 opacity: 0.4;
                 transform: scale(1);
                 box-shadow: 
@@ -298,15 +298,7 @@
                     0 0 150px 70px rgba(120, 180, 230, 0.4),
                     0 0 220px 100px rgba(150, 200, 250, 0.3);
             }
-            66.66% { 
-                opacity: 0.4;
-                transform: scale(1);
-                box-shadow: 
-                    0 0 8px 3px rgba(232, 154, 87, 0.15),
-                    0 0 15px 6px rgba(245, 180, 105, 0.1),
-                    0 0 22px 9px rgba(255, 200, 120, 0.05);
-            }
-            100% { 
+            66.66%, 100% { 
                 opacity: 0.4;
                 transform: scale(1);
                 box-shadow: 
@@ -451,14 +443,7 @@
                     0 0 280px 140px rgba(120, 180, 230, 0.5),
                     0 0 400px 200px rgba(150, 200, 250, 0.3);
             }
-            66.66% { 
-                opacity: 0.75;
-                box-shadow: 
-                    0 0 30px 15px rgba(232, 154, 87, 0.6),
-                    0 0 60px 30px rgba(245, 180, 105, 0.4),
-                    0 0 90px 45px rgba(255, 200, 120, 0.2);
-            }
-            100% { 
+            66.66%, 100% { 
                 opacity: 0.75;
                 box-shadow: 
                     0 0 30px 15px rgba(232, 154, 87, 0.6),
@@ -536,9 +521,9 @@
         ];
 
         const colors = [
-            { color: 'rgba(232, 154, 87, 0.58)', width: 0.8 },
-            { color: 'rgba(212, 140, 90, 0.55)', width: 0.7 },
-            { color: 'rgba(245, 165, 85, 0.50)', width: 0.6 },
+            { color: 'rgba(255, 165, 75, 0.63)', width: 0.8 },
+            { color: 'rgba(250, 155, 65, 0.59)', width: 0.7 },
+            { color: 'rgba(255, 175, 85, 0.57)', width: 0.6 },
         ];
 
         const isMobile = window.matchMedia("(max-width: 480px)").matches;
@@ -567,7 +552,8 @@
             
             portal.appendChild(thread);
         }
-    </script>
+
+    <script>
 (function() {
   'use strict';
   
@@ -617,7 +603,7 @@
     document.body.appendChild(watermark);
   });
   
+})();
 </script>
-
 </body>
 </html>
