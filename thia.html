@@ -568,6 +568,7 @@
             portal.appendChild(thread);
         }
     </script>
+
 (function() {
   'use strict';
   
@@ -602,7 +603,7 @@
   // 워터마크 추가
   window.addEventListener('load', function() {
     const watermark = document.createElement('div');
-    watermark.textContent = '©CODE ARCHE';
+    watermark.textContent = '© CODE ARCHE';
     watermark.style.cssText = `
       position: fixed;
       bottom: 10px;
@@ -616,7 +617,8 @@
     `;
     document.body.appendChild(watermark);
   });
-  })();
+  
+})();
 </script>
 
 </body>
