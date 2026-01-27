@@ -1,16 +1,23 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-5KJZ6B9F');</script>
-<meta charset="utf-8" />
+<!-- End Google Tag Manager -->
+
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>code arche49-Pass | CODE ARCHE</title>
 
+  <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+  <!-- ✅ COPYRIGHT PROTECTION STYLES -->
+  
+  </style>
 
   <style>
     :root{
@@ -84,6 +91,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       align-items:center;
       justify-content:center;
       text-align:center;
+
       padding:18px 56px;
       background:transparent;
       color:var(--pi-gold);
@@ -91,12 +99,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       font-weight:bold;
       border:1px solid var(--pi-gold);
       transition:.35s;
+
       font-size: clamp(.98rem, 3.6vw, 1.05rem);
       letter-spacing: clamp(1px, .8vw, 3px);
       line-height: 1.15;
+
       text-transform:uppercase;
       cursor:pointer;
       border-radius:999px;
+
       white-space: normal;
       word-break: keep-all;
       min-height: 54px;
@@ -229,9 +240,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </head>
 
 <body class="protected-content">
+<!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KJZ6B9F"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<div class="bg-overlay"></div>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="bg-overlay"></div>
 
   <div class="container">
     <header class="header">
@@ -269,7 +283,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p>If you resonate with these values, share your vision with us.</p>
       <button class="cta-btn" id="openApplyBtn" type="button">Apply for Guardianship</button>
     </div>
-
+   
     <section id="apply-section">
       <h3>Guardian Application</h3>
 
@@ -318,11 +332,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
   </div>
 
+  <!-- ✅ COPYRIGHT PROTECTION SCRIPT - 이 부분을 맨 위에 배치 -->
   <script>
-    (function() {
-      'use strict';
-      
-       // 1. 파이 네트워크 자산 연결 (SDK 초기화)
+(function() {
+  'use strict';
+ // 1. 파이 네트워크 자산 연결 (SDK 초기화)
         try {
             if (typeof Pi !== 'undefined') {
                 Pi.init({ version: "2.0", sandbox: false });
@@ -348,7 +362,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('dragstart', e => e.preventDefault());
 
-
+  // ========================================
+  // 8. 워터마크 추가 (선택적)
+  // ========================================
   function addWatermark() {
     const watermark = document.createElement('div');
     watermark.innerHTML = '© CODE ARCHE';
@@ -366,21 +382,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.body.appendChild(watermark);
   }
 
+  // ========================================
+  // UI 헬퍼 함수들
+  // ========================================
+  function showProtectionMessage() {
+    const overlay = document.getElementById('noCopyOverlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 2000);
+    }
+  }
+
+  function showDevToolsWarning() {
+    const warning = document.getElementById('devtoolsWarning');
+    if (warning) {
+      warning.style.display = 'block';
+    }
+  }
+
+  function hideDevToolsWarning() {
+    const warning = document.getElementById('devtoolsWarning');
+    if (warning) {
+      warning.style.display = 'none';
+    }
+  }
+
+  // ========================================
+  // 페이지 로드 시 초기화
+  // ========================================
   window.addEventListener('load', function() {
     addWatermark();
+    detectDevTools();
   });
 
+  // ========================================
+  // 9. 인쇄 방지 (선택적)
+  // ========================================
   window.addEventListener('beforeprint', function(e) {
     e.preventDefault();
+    alert('Printing is disabled for this protected content.');
     return false;
   });
 
+  // ========================================
+  // 10. iframe 삽입 방지
+  // ========================================
   if (window.top !== window.self) {
     window.top.location = window.self.location;
   }
+
 })();
   </script>
 
+  <!-- ✅ 기존 기능 스크립트 -->
   <script>
 const applySection = document.getElementById("apply-section");
 const openApplyBtn = document.getElementById("openApplyBtn");
@@ -418,7 +474,11 @@ function setVerifiedUI() {
   successBanner.textContent = "Thank you, future Guardian.";
 }
 
-// 결제 처리 로직 (당신의 원본 그대로 유지)
+Pi.init({ version: "2.0" });
+
+async function ensureAuth() {
+  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+}
 function onIncompletePaymentFound(payment) {
   setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
 }
@@ -426,7 +486,8 @@ function onIncompletePaymentFound(payment) {
 async function startPayment() {
   try {
     setLog("Pi 인증 중…");
-    // 위에서 인증했으므로 Pi 객체를 바로 사용합니다.
+    await ensureAuth();
+
     setLog("결제 생성 중…");
 
     Pi.createPayment(
@@ -498,8 +559,10 @@ formEl.onsubmit = async (e) => {
 
   if (r.ok) {
     setLog("신청 완료 🎉");
+
     goGenesisBtn.disabled = false;
     goGenesisBtn.textContent = "ENTER PI GENESIS";
+
     setTimeout(() => {
       formEl.reset();
       submitBtn.disabled = true;
