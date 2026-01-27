@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pi Genesis | CODE ARCHE</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         :root {
             --nexus-gold: #ffcc33;
@@ -12,7 +13,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 14.2.px; }
+        html { font-size: 14.2px; }
         
         body { 
             background-color: var(--deep-void); 
@@ -24,6 +25,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            zoom: 0.9; 
         }
 
         .nexus-bg {
@@ -77,36 +79,10 @@
             opacity: 0.2;
         }
 
-        .layer-1 {
-            width: 60px;
-            height: 60px;
-            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-            animation-delay: 0s;
-        }
-
-        .layer-2 {
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(255,204,51,0.3) 0%, transparent 70%);
-            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-            animation-delay: 0.6s;
-        }
-
-        .layer-3 {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255,204,51,0.2) 0%, transparent 70%);
-            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-            animation-delay: 1.2s;
-        }
-
-        .layer-4 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,204,51,0.15) 0%, transparent 70%);
-            animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-            animation-delay: 1.8s;
-        }
+        .layer-1 { width: 60px; height: 60px; animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite; }
+        .layer-2 { width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,204,51,0.3) 0%, transparent 70%); animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite; animation-delay: 0.6s; }
+        .layer-3 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,204,51,0.2) 0%, transparent 70%); animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite; animation-delay: 1.2s; }
+        .layer-4 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,204,51,0.15) 0%, transparent 70%); animation: expandPulse 20s cubic-bezier(0.42, 0, 0.58, 1) infinite; animation-delay: 1.8s; }
 
         .portal-core {
             position: absolute;
@@ -126,31 +102,11 @@
             animation: rotate 20s infinite linear;
         }
 
-        .ring-1 { 
-            width: 100%; 
-            height: 100%; 
-            animation-duration: 35s;
-        }
-        
-        .ring-2 { 
-            width: 80%; 
-            height: 80%; 
-            animation-duration: 28s; 
-            animation-direction: reverse;
-        }
-        
-        .ring-3 { 
-            width: 60%; 
-            height: 60%; 
-            animation-duration: 45s; 
-            border-color: rgba(255,255,255,0.08);
-        }
+        .ring-1 { width: 100%; height: 100%; animation-duration: 35s; }
+        .ring-2 { width: 80%; height: 80%; animation-duration: 28s; animation-direction: reverse; }
+        .ring-3 { width: 60%; height: 60%; animation-duration: 45s; border-color: rgba(255,255,255,0.08); }
 
-        .content {
-            text-align: center;
-            max-width: 2000px;
-            flex-shrink: 1;
-        }
+        .content { text-align: center; max-width: 2000px; flex-shrink: 1; }
 
         .arche-prefix {
             font-size: clamp(0.7rem, 1.22vw, 0.9875rem);
@@ -186,11 +142,7 @@
             animation: fadeIn 5s ease-in;
         }
 
-        .manifesto b { 
-            color: #fff; 
-            font-weight: 300; 
-            font-style: italic; 
-        }
+        .manifesto b { color: #fff; font-weight: 300; font-style: italic; }
 
         .enter-ritual {
             padding: clamp(14px, 2.5vw, 20px) clamp(40px, 6vw, 60px);
@@ -223,145 +175,33 @@
             letter-spacing: clamp(6px, 1.3vw, 10px);
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes starPulse {
-            0% { 
-                transform: scale(0.7);
-                opacity: 0.12;
-                box-shadow: 
-                    0 0 3.3px rgba(255,255,255,0.08),
-                    0 0 6.6px rgba(255,204,51,0.06);
-            }
-            35% { 
-                transform: scale(0.75);
-                opacity: 0.18;
-                box-shadow: 
-                    0 0 4.4px rgba(255,255,255,0.12),
-                    0 0 8.8px rgba(255,204,51,0.1);
-            }
-            45%, 83% { 
-                transform: scale(2.57);
-                opacity: 1;
-                box-shadow: 
-                    0 0 60.5px rgba(255,255,255,0.95),
-                    0 0 121px var(--nexus-gold),
-                    0 0 181.5px rgba(255,204,51,0.8);
-            }
-            95% {
-                transform: scale(0.75);
-                opacity: 0.18;
-                box-shadow: 
-                    0 0 4.4px rgba(255,255,255,0.12),
-                    0 0 8.8px rgba(255,204,51,0.1);
-            }
-            100% {
-                transform: scale(0.7);
-                opacity: 0.12;
-                box-shadow: 
-                    0 0 3.3px rgba(255,255,255,0.08),
-                    0 0 6.6px rgba(255,204,51,0.06);
-            }
+            0% { transform: scale(0.7); opacity: 0.12; box-shadow: 0 0 3.3px rgba(255,255,255,0.08), 0 0 6.6px rgba(255,204,51,0.06); }
+            45%, 83% { transform: scale(2.57); opacity: 1; box-shadow: 0 0 60.5px rgba(255,255,255,0.95), 0 0 121px var(--nexus-gold), 0 0 181.5px rgba(255,204,51,0.8); }
+            100% { transform: scale(0.7); opacity: 0.12; }
         }
-
         @keyframes expandPulse {
-            0% { 
-                transform: scale(0.85);
-                opacity: 0.2;
-            }
-            45%, 83% { 
-                transform: scale(1.65);
-                opacity: 0.8;
-            }
-            95% { 
-                transform: scale(0.85);
-                opacity: 0.2;
-            }
-            100% { 
-                transform: scale(0.85);
-                opacity: 0.2;
-            }
+            0% { transform: scale(0.85); opacity: 0.2; }
+            45%, 83% { transform: scale(1.65); opacity: 0.8; }
+            100% { transform: scale(0.85); opacity: 0.2; }
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         @media (max-width: 1024px) {
-            .container {
-                flex-direction: column;
-                gap: clamp(30px, 6vh, 60px);
-            }
-            
-            .portal-rings {
-                width: clamp(275px, 66vw, 440px);
-                height: clamp(275px, 66vw, 440px);
-            }
+            body { zoom: 1.0; }
+            .container { flex-direction: column; gap: clamp(30px, 6vh, 60px); }
+            .portal-rings { width: clamp(275px, 66vw, 440px); height: clamp(275px, 66vw, 440px); }
         }
 
         @media (max-width: 768px) {
             html { font-size: 14px; }
-            
-            body { 
-                padding: 15px;
-            }
-            
-            .portal-rings {
-                width: clamp(242px, 77vw, 352px);
-                height: clamp(242px, 77vw, 352px);
-            }
-
-            .ring {
-                border-width: 0.8px;
-            }
-
-            .portal-core {
-                filter: blur(30px);
-            }
-body { 
-    background-color: var(--deep-void); 
-    color: var(--stellar-white); 
-    font-family: 'Cinzel', serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    zoom: 0.9; 
-    /* transform: scale(0.8); transform-origin: center; */
-}
-
-/* 모바일/태블릿에서는 다시 100%로 복구 (이미 만족하신 상태 유지) */
-@media (max-width: 1024px) {
-    body {
-        zoom: 1.0;
-    }
-}
-        }@media (max-width: 768px) {
-    /* 기존에 있는 설정들 아래에 이 내용을 추가하세요 */
-    
-    .signature {
-        /* 모바일에서만 폰트 크기를 강제로 낮춤 (기존 대비 약 20-30% 축소) */
-        font-size: 0.85rem !important; 
-        opacity: 0.6; /* 모바일에서는 시선을 너무 끌지 않게 투명도를 살짝 더 낮춤 */
-    }
-}
-/* ===== PC에서만 Pi Genesis 한 줄 유지 ===== */
-@media (min-width: 1200px) {
-  .main-heading {
-    white-space: nowrap;
-  }
-}
+            body { padding: 15px; }
+            .portal-rings { width: clamp(242px, 77vw, 352px); height: clamp(242px, 77vw, 352px); }
+            .signature { font-size: 0.85rem !important; opacity: 0.6; }
+        }
+        @media (min-width: 1200px) { .main-heading { white-space: nowrap; } }
     </style>
 </head>
 <body>
@@ -392,58 +232,46 @@ body {
             <button class="enter-ritual">Wait for the Alignment</button>
             <div class="signature">Patience by Archeon THIA</div>
         </div>
-  <script>
-(function() {
-  'use strict';
-  
-  // 우클릭 차단
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-  });
-  
-  // F12, Ctrl+Shift+I, Ctrl+U 차단
-  document.addEventListener('keydown', function(e) {
-    if (e.keyCode === 123 || 
-        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
-        (e.ctrlKey && e.keyCode === 85)) {
-      e.preventDefault();
-      return false;
-    }
-  });
-  
-  // 복사 차단
-  document.addEventListener('copy', function(e) {
-    e.preventDefault();
-    return false;
-  });
-  
-  // 드래그 차단
-  document.addEventListener('dragstart', function(e) {
-    e.preventDefault();
-    return false;
-  });
-  
-  // 워터마크 추가
-  window.addEventListener('load', function() {
-    const watermark = document.createElement('div');
-    watermark.textContent = '© CODE ARCHE';
-    watermark.style.cssText = `
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 10px;
-      color: rgba(255, 165, 0, 0.3);
-      pointer-events: none;
-      z-index: 9999;
-      font-family: monospace;
-      letter-spacing: 2px;
-    `;
-    document.body.appendChild(watermark);
-  });
-  
-})();
-</script>
- 
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+        
+        // 1. 파이 네트워크 자산 연결 (SDK 초기화)
+        try {
+            if (typeof Pi !== 'undefined') {
+                Pi.init({ version: "2.0", sandbox: false });
+                
+                // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다 (자산 기록의 시작)
+                Pi.authenticate(['username'], function(payment) {
+                    console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+                }).catch(function(error) {
+                    console.error("인증 실패:", error);
+                });
+            }
+        } catch (err) {
+            console.log("파이 브라우저 환경이 아닙니다.");
+        }
+
+        // 2. 당신의 소중한 보안 스크립트 (우클릭, F12, 복사 차단)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+            }
+        });
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        // 3. 워터마크 레이어 추가
+        window.addEventListener('load', () => {
+            const watermark = document.createElement('div');
+            watermark.textContent = '© CODE ARCHE';
+            watermark.style.cssText = `position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255, 204, 51, 0.2); pointer-events: none; z-index: 9999; font-family: monospace; letter-spacing: 2px;`;
+            document.body.appendChild(watermark);
+        });
+    })();
+    </script>
 </body>
 </html>
