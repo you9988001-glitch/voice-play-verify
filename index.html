@@ -319,18 +319,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <script>
-(function() {
-  'use strict';
- 
-  // [자산화 매듭] 파이 브라우저 접속 시 유저를 인증하고 체류 기록 통로를 엽니다.
-  // 이 부분이 당신의 앱이 '공식 자산'으로 인정받게 돕는 핵심입니다.
-  try {
-    Pi.init({ version: "2.0", sandbox: false });
-    Pi.authenticate(['username', 'payments'], onIncompletePaymentFound)
-      .then(function(auth) {
-        console.log("[Code Arche] " + auth.user.username + "님 연결됨");
-      }).catch(function(err) { console.error(err); });
-  } catch (e) { console.log("외부 브라우저"); }
+    (function() {
+      'use strict';
+      
+      // 1. 파이 자산 연결 및 인증
+      try {
+        Pi.init({ version: "2.0", sandbox: false });
+        Pi.authenticate(['username', 'payments'], onIncompletePaymentFound)
+          .then(function(auth) {
+            document.getElementById('log').textContent = auth.user.username + "님, 환영합니다.";
+          }).catch(function(err) { console.error(err); });
+      } catch (e) { console.log("외부 접속"); }
 
   function addWatermark() {
     const watermark = document.createElement('div');
