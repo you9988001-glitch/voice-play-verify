@@ -332,7 +332,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
   </div>
 
-  <!-- ✅ COPYRIGHT PROTECTION SCRIPT - 이 부분을 맨 위에 배치 -->
+  <!-- ✅ COPYRIGHT PROTECTION SCRIPT -->
   <script>
 (function() {
   'use strict';
@@ -344,6 +344,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다 (자산 기록의 시작)
                 Pi.authenticate(['username'], function(payment) {
                     console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+                    // ✅ 인증 완료 후 sessionStorage에 저장
+                    sessionStorage.setItem('piAuthenticated', 'true');
                 }).catch(function(error) {
                     console.error("인증 실패:", error);
                 });
