@@ -1,46 +1,24 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <!-- Google Tag Manager -->
-  <script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5KJZ6B9F');
-  </script>
-  <!-- End Google Tag Manager -->
+<head><!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5KJZ6B9F');</script>
+<!-- End Google Tag Manager -->
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>code arche49-Pass | CODE ARCHE</title>
 
-  <!-- Pi SDK (외부 로드 전용: 안에 코드 쓰면 안 됨) -->
+  <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-  <!-- Pi SDK 초기화 + 1회 인증 상태 관리 -->
-  <script>
-    // ✅ Pi 초기화는 반드시 1회만
-    Pi.init({ version: "2.0" });
-
-    // ✅ 인증 1회만 수행하고 세션에 저장
-    async function ensureAuthOnce() {
-      if (sessionStorage.getItem("pi_authed") === "yes") return true;
-
-      await Pi.authenticate(["payments"], onIncompletePaymentFound);
-      sessionStorage.setItem("pi_authed", "yes");
-      return true;
-    }
-
-    // ✅ 미완료 결제 핸들러(로그 함수가 준비되기 전일 수도 있으니 안전 처리)
-    function onIncompletePaymentFound(payment) {
-      if (typeof setLog === "function") {
-        setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
-      }
-    }
-  </script>
-
   <!-- ✅ COPYRIGHT PROTECTION STYLES -->
+  
+  </style>
+
   <style>
     :root{
       --pi-gold:#ffa500;
@@ -63,7 +41,7 @@
       opacity:0;
       animation:fadeIn 9s ease-out 2s forwards;
     }
-
+    
     @keyframes fadeIn{
       from{opacity:0;}
       to{opacity:1;}
@@ -262,12 +240,10 @@
 </head>
 
 <body class="protected-content">
-  <!-- Google Tag Manager (noscript) -->
-  <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KJZ6B9F"
-      height="0" width="0" style="display:none;visibility:hidden"></iframe>
-  </noscript>
-  <!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KJZ6B9F"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
   <div class="bg-overlay"></div>
 
@@ -358,178 +334,223 @@
 
   <!-- ✅ COPYRIGHT PROTECTION SCRIPT - 이 부분을 맨 위에 배치 -->
   <script>
-    (function() {
-      'use strict';
+(function() {
+  'use strict';
+ 
+  // ========================================
+  // 8. 워터마크 추가 (선택적)
+  // ========================================
+  function addWatermark() {
+    const watermark = document.createElement('div');
+    watermark.innerHTML = '© CODE ARCHE';
+    watermark.style.cssText = `
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 10px;
+      color: rgba(255, 165, 0, 0.3);
+      pointer-events: none;
+      z-index: 9999;
+      font-family: monospace;
+      letter-spacing: 2px;
+    `;
+    document.body.appendChild(watermark);
+  }
 
-      function addWatermark() {
-        const watermark = document.createElement('div');
-        watermark.innerHTML = '© CODE ARCHE';
-        watermark.style.cssText = `
-          position: fixed;
-          bottom: 10px;
-          right: 10px;
-          font-size: 10px;
-          color: rgba(255, 165, 0, 0.3);
-          pointer-events: none;
-          z-index: 9999;
-          font-family: monospace;
-          letter-spacing: 2px;
-        `;
-        document.body.appendChild(watermark);
-      }
+  // ========================================
+  // UI 헬퍼 함수들
+  // ========================================
+  function showProtectionMessage() {
+    const overlay = document.getElementById('noCopyOverlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 2000);
+    }
+  }
 
-      window.addEventListener('load', function() {
-        addWatermark();
-        // detectDevTools(); // 원본에 있었지만 정의가 없으면 에러날 수 있어. 필요하면 너가 쓰는 detectDevTools를 넣어줘.
-      });
+  function showDevToolsWarning() {
+    const warning = document.getElementById('devtoolsWarning');
+    if (warning) {
+      warning.style.display = 'block';
+    }
+  }
 
-      window.addEventListener('beforeprint', function(e) {
-        e.preventDefault();
-        alert('Printing is disabled for this protected content.');
-        return false;
-      });
+  function hideDevToolsWarning() {
+    const warning = document.getElementById('devtoolsWarning');
+    if (warning) {
+      warning.style.display = 'none';
+    }
+  }
 
-      if (window.top !== window.self) {
-        window.top.location = window.self.location;
-      }
-    })();
+  // ========================================
+  // 페이지 로드 시 초기화
+  // ========================================
+  window.addEventListener('load', function() {
+    addWatermark();
+    detectDevTools();
+  });
+
+  // ========================================
+  // 9. 인쇄 방지 (선택적)
+  // ========================================
+  window.addEventListener('beforeprint', function(e) {
+    e.preventDefault();
+    alert('Printing is disabled for this protected content.');
+    return false;
+  });
+
+  // ========================================
+  // 10. iframe 삽입 방지
+  // ========================================
+  if (window.top !== window.self) {
+    window.top.location = window.self.location;
+  }
+
+})();
   </script>
 
-  <!-- ✅ 기존 기능 스크립트 (핵심: ensureAuthOnce 사용) -->
+  <!-- ✅ 기존 기능 스크립트 -->
   <script>
-    const applySection = document.getElementById("apply-section");
-    const openApplyBtn = document.getElementById("openApplyBtn");
-    const closeApplyBtn = document.getElementById("closeApplyBtn");
-    const logEl = document.getElementById("log");
-    const successBanner = document.getElementById("success-banner");
-    const formEl = document.getElementById("guardianForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const goGenesisBtn = document.getElementById("goGenesisBtn");
+const applySection = document.getElementById("apply-section");
+const openApplyBtn = document.getElementById("openApplyBtn");
+const closeApplyBtn = document.getElementById("closeApplyBtn");
+const logEl = document.getElementById("log");
+const successBanner = document.getElementById("success-banner");
+const formEl = document.getElementById("guardianForm");
+const submitBtn = document.getElementById("submitBtn");
+const goGenesisBtn = document.getElementById("goGenesisBtn");
 
-    // ✅ 전역에서 쓰도록 window에 달아도 되고, 여기서 선언해도 됨
-    const setLog = (m) => { logEl.textContent = m; };
-    // ensureAuthOnce의 onIncompletePaymentFound에서 setLog를 쓸 수 있도록 전역 노출(안전)
-    window.setLog = setLog;
+const setLog = (m) => { logEl.textContent = m; };
 
-    function openForm() {
-      applySection.style.display = "block";
-      applySection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    function closeForm() {
-      applySection.style.display = "none";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    openApplyBtn.onclick = openForm;
-    closeApplyBtn.onclick = closeForm;
+function openForm() {
+  applySection.style.display = "block";
+  applySection.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function closeForm() {
+  applySection.style.display = "none";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+openApplyBtn.onclick = openForm;
+closeApplyBtn.onclick = closeForm;
 
-    goGenesisBtn.onclick = () => {
-      window.location.href = "/pi-genesis.html";
-    };
+goGenesisBtn.onclick = () => {
+  window.location.href = "/pi-genesis.html";
+};
 
-    let proofToken = null;
-    submitBtn.disabled = true;
-    goGenesisBtn.disabled = true;
+let proofToken = null;
+submitBtn.disabled = true;
+goGenesisBtn.disabled = true;
 
-    function setVerifiedUI() {
-      submitBtn.disabled = false;
-      successBanner.style.display = "block";
-      successBanner.textContent = "Thank you, future Guardian.";
-    }
+function setVerifiedUI() {
+  submitBtn.disabled = false;
+  successBanner.style.display = "block";
+  successBanner.textContent = "Thank you, future Guardian.";
+}
 
-    async function startPayment() {
-      try {
-        setLog("Pi 인증 중…");
-        // ✅ 핵심: 한 번만 인증하고 세션에 저장
-        await ensureAuthOnce();
+Pi.init({ version: "2.0" });
 
-        setLog("결제 생성 중…");
+async function ensureAuth() {
+  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+}
+function onIncompletePaymentFound(payment) {
+  setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
+}
 
-        Pi.createPayment(
-          {
-            amount: 0.01,
-            memo: "Code Arche Guardian verification",
-            metadata: { app: "code-arche" },
-          },
-          {
-            onReadyForServerApproval: async (paymentId) => {
-              setLog("서버 승인 요청 중…");
-              const r = await fetch("/api/approve", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ paymentId }),
-              });
-              const j = await r.json().catch(() => ({}));
-              if (!r.ok) throw new Error("approve failed: " + JSON.stringify(j));
-              setLog("서버 승인 완료 ✅");
-            },
+async function startPayment() {
+  try {
+    setLog("Pi 인증 중…");
+    await ensureAuth();
 
-            onReadyForServerCompletion: async (paymentId, txid) => {
-              setLog("서버 완료 요청 중…");
-              const r = await fetch("/api/complete", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ paymentId, txid }),
-              });
-              const j = await r.json().catch(() => ({}));
-              if (!r.ok) throw new Error("complete failed: " + JSON.stringify(j));
+    setLog("결제 생성 중…");
 
-              proofToken = j.proofToken || "ok";
-              setVerifiedUI();
-              setLog("결제 완료 ✅ 이제 제출 가능");
-            },
+    Pi.createPayment(
+      {
+        amount: 0.01,
+        memo: "Code Arche Guardian verification",
+        metadata: { app: "code-arche" },
+      },
+      {
+        onReadyForServerApproval: async (paymentId) => {
+          setLog("서버 승인 요청 중…");
+          const r = await fetch("/api/approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentId }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error("approve failed: " + JSON.stringify(j));
+          setLog("서버 승인 완료 ✅");
+        },
 
-            onCancel: () => setLog("사용자가 결제를 취소했습니다."),
-            onError: (e) => setLog("결제 오류: " + (e?.message || e)),
-          }
-        );
-      } catch (e) {
-        setLog("초기화 실패: " + String(e));
+        onReadyForServerCompletion: async (paymentId, txid) => {
+          setLog("서버 완료 요청 중…");
+          const r = await fetch("/api/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentId, txid }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error("complete failed: " + JSON.stringify(j));
+
+          proofToken = j.proofToken || "ok";
+          setVerifiedUI();
+          setLog("결제 완료 ✅ 이제 제출 가능");
+        },
+
+        onCancel: () => setLog("사용자가 결제를 취소했습니다."),
+        onError: (e) => setLog("결제 오류: " + (e?.message || e)),
       }
-    }
+    );
+  } catch (e) {
+    setLog("초기화 실패: " + String(e));
+  }
+}
 
-    document.getElementById("payBtn").onclick = startPayment;
+document.getElementById("payBtn").onclick = startPayment;
 
-    formEl.onsubmit = async (e) => {
-      e.preventDefault();
-      if (!proofToken) {
-        setLog("먼저 결제를 완료해야 합니다.");
-        return;
-      }
+formEl.onsubmit = async (e) => {
+  e.preventDefault();
+  if (!proofToken) {
+    setLog("먼저 결제를 완료해야 합니다.");
+    return;
+  }
 
-      const fd = new FormData(formEl);
-      const payload = {
-        name: fd.get("name"),
-        email: fd.get("email"),
-        vision: fd.get("vision"),
-        proofToken,
-      };
+  const fd = new FormData(formEl);
+  const payload = {
+    name: fd.get("name"),
+    email: fd.get("email"),
+    vision: fd.get("vision"),
+    proofToken,
+  };
 
-      setLog("제출 중…");
-      const r = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  setLog("제출 중…");
+  const r = await fetch("/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-      if (r.ok) {
-        setLog("신청 완료 🎉");
+  if (r.ok) {
+    setLog("신청 완료 🎉");
 
-        goGenesisBtn.disabled = false;
-        goGenesisBtn.textContent = "ENTER PI GENESIS";
+    goGenesisBtn.disabled = false;
+    goGenesisBtn.textContent = "ENTER PI GENESIS";
 
-        setTimeout(() => {
-          formEl.reset();
-          submitBtn.disabled = true;
-          proofToken = null;
-          successBanner.style.display = "none";
-          closeForm();
-        }, 3000);
-      } else {
-        const err = await r.json().catch(() => ({}));
-        setLog("제출 실패: " + (err?.error || "unknown"));
-      }
-    };
-  </script>
+    setTimeout(() => {
+      formEl.reset();
+      submitBtn.disabled = true;
+      proofToken = null;
+      successBanner.style.display = "none";
+      closeForm();
+    }, 3000);
+  } else {
+    const err = await r.json().catch(() => ({}));
+    setLog("제출 실패: " + (err?.error || "unknown"));
+  }
+};
+</script>
 
 </body>
 </html>
