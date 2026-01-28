@@ -452,7 +452,7 @@ function setVerifiedUI() {
 Pi.init({ version: "2.0" });
 
 async function ensureAuth() {
-  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+  return await Pi.authenticate(['username''payments'], onIncompletePaymentFound);
 }
 function onIncompletePaymentFound(payment) {
   setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
