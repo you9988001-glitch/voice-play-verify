@@ -230,22 +230,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       box-shadow:0 0 40px rgba(255,165,0,.16);
     }
 
-    /* 디버그 메시지 스타일 */
-    .debug-msg{
-      position:fixed;
-      top:10px;
-      left:10px;
-      background:rgba(0,0,0,0.9);
-      color:#0f0;
-      padding:10px;
-      font-size:11px;
-      z-index:99999;
-      border:1px solid #0f0;
-      font-family:monospace;
-      max-width:300px;
-      word-wrap:break-word;
-    }
-
     footer{text-align:center;padding:90px 0 20px;font-size:.78rem;opacity:.45;letter-spacing:2px}
     a{color:inherit}
   </style>
@@ -348,47 +332,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 (function() {
   'use strict';
 
-  // ✅ 디버그 메시지 표시 함수
-  function showDebug(msg) {
-    const debugDiv = document.createElement('div');
-    debugDiv.className = 'debug-msg';
-    debugDiv.textContent = msg;
-    document.body.appendChild(debugDiv);
-    setTimeout(() => debugDiv.remove(), 5000);
-  }
-
-  // 1. 파이 네트워크 자산 연결 (SDK 초기화)
   try {
     if (typeof Pi !== 'undefined') {
       Pi.init({ version: "2.0", sandbox: false });
       
-      // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다
       Pi.authenticate(['username'], function(payment) {
-        console.log("%c[첫 페이지] 파이 인증 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+        console.log("[첫 페이지] 인증 성공: " + payment.user.username);
         
-        // ✅ sessionStorage에 저장
         try {
-          sessionStorage.setItem('piAuthenticated', 'true');
-          sessionStorage.setItem('piUser', payment.user.username);
-          console.log("%c[첫 페이지] sessionStorage 저장 완료", "color: lime; font-weight: bold;");
-          showDebug('[첫 페이지] 인증 완료 & 저장됨');
+          localStorage.setItem('piAuthenticated', 'true');
+          localStorage.setItem('piUser', payment.user.username);
+          console.log("[첫 페이지] localStorage 저장 완료");
         } catch(e) {
           console.error("저장 실패:", e);
-          showDebug('[첫 페이지] 저장 실패: ' + e.message);
         }
       }).catch(function(error) {
         console.error("인증 실패:", error);
-        showDebug('[첫 페이지] 인증 실패');
       });
-    } else {
-      showDebug('[첫 페이지] Pi SDK 없음');
     }
   } catch (err) {
     console.log("파이 브라우저 환경이 아닙니다:", err);
-    showDebug('[첫 페이지] 환경 오류');
   }
 
-  // 2. 보안 스크립트
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
@@ -398,7 +363,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   document.addEventListener('copy', e => e.preventDefault());
   document.addEventListener('dragstart', e => e.preventDefault());
 
-  // 워터마크 추가
   function addWatermark() {
     const watermark = document.createElement('div');
     watermark.innerHTML = '© CODE ARCHE';
