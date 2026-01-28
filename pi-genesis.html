@@ -243,7 +243,7 @@
     if (typeof Pi !== 'undefined') {
         Pi.init({ version: "2.0" });
         // 'payments'까지 한꺼번에 요청해야 다음 페이지에서 팝업이 안 뜹니다.
-        Pi.authenticate(['payments'], function(payment) {
+        Pi.authenticate(['username''payments'], function(payment) {
             console.log("연결 성공: " + payment.);
         }).catch(function(error) {
             console.error("인증 지연:", error);
