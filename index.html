@@ -279,7 +279,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </ul>
     </section>
 
-    <div class="center" id="apply-section">
+    <div class="center">
       <p>If you resonate with these values, share your vision with us.</p>
       <button class="cta-btn" id="openApplyBtn" type="button">Apply for Guardianship</button>
     </div>
@@ -550,21 +550,6 @@ formEl.onsubmit = async (e) => {
     setLog("제출 실패: " + (err?.error || "unknown"));
   }
 };
-
-// ✅ 팝업 중복 방지 및 자산 연결 핵심 매듭
-try {
-    if (typeof Pi !== 'undefined') {
-        Pi.init({ version: "2.0" });
-        // 'payments'까지 한꺼번에 요청해야 다음 페이지에서 팝업이 안 뜹니다.
-        Pi.authenticate(['username', 'payments'], function(payment) {
-            console.log("연결 성공: " + payment.user.username);
-        }).catch(function(error) {
-            console.error("인증 지연:", error);
-        });
-    }
-} catch (e) {
-    console.log("브라우저 환경 확인 중...");
-}
 </script>
 
 </body>
