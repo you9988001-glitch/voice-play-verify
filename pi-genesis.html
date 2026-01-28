@@ -243,12 +243,18 @@
             if (typeof Pi !== 'undefined') {
                 Pi.init({ version: "2.0", sandbox: false });
                 
-                // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다 (자산 기록의 시작)
-                Pi.authenticate(['username'], function(payment) {
-                    console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
-                }).catch(function(error) {
-                    console.error("인증 실패:", error);
-                });
+                // ✅ 이미 인증됐는지 확인
+                if (sessionStorage.getItem('piAuthenticated') === 'true') {
+                    console.log("%c[Pi Genesis] 이미 인증 완료됨 (팝업 생략)", "color: #ffcc33; font-weight: bold;");
+                } else {
+                    // 처음이면 인증 팝업 실행
+                    Pi.authenticate(['username'], function(payment) {
+                        console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+                        sessionStorage.setItem('piAuthenticated', 'true');
+                    }).catch(function(error) {
+                        console.error("인증 실패:", error);
+                    });
+                }
             }
         } catch (err) {
             console.log("파이 브라우저 환경이 아닙니다.");
