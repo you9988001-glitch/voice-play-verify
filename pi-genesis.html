@@ -175,6 +175,36 @@
             letter-spacing: clamp(6px, 1.3vw, 10px);
         }
 
+        /* ✅ 디버그 박스 스타일 */
+        .debug-box {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.95);
+            color: #0f0;
+            padding: 15px;
+            font-size: 11px;
+            z-index: 99999;
+            border: 2px solid #0f0;
+            font-family: monospace;
+            max-width: 320px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .debug-box .title {
+            color: #ff0;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 5px;
+        }
+        .debug-box .item {
+            margin: 5px 0;
+        }
+        .debug-box .value {
+            color: #0ff;
+        }
+
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes starPulse {
             0% { transform: scale(0.7); opacity: 0.12; box-shadow: 0 0 3.3px rgba(255,255,255,0.08), 0 0 6.6px rgba(255,204,51,0.06); }
@@ -200,6 +230,7 @@
             body { padding: 15px; }
             .portal-rings { width: clamp(242px, 77vw, 352px); height: clamp(242px, 77vw, 352px); }
             .signature { font-size: 0.85rem !important; opacity: 0.6; }
+            .debug-box { font-size: 10px; max-width: 280px; padding: 10px; }
         }
         @media (min-width: 1200px) { .main-heading { white-space: nowrap; } }
     </style>
@@ -238,29 +269,67 @@
     (function() {
         'use strict';
         
+        // ✅ 디버그 박스 생성 및 표시
+        function createDebugBox() {
+            const debugBox = document.createElement('div');
+            debugBox.className = 'debug-box';
+            debugBox.id = 'debugBox';
+            
+            // sessionStorage 값 읽기
+            const authValue = sessionStorage.getItem('piAuthenticated');
+            const userValue = sessionStorage.getItem('piUser');
+            
+            debugBox.innerHTML = `
+                <div class="title">[두 번째 페이지] 디버그</div>
+                <div class="item">인증상태: <span class="value">${authValue || 'null'}</span></div>
+                <div class="item">사용자: <span class="value">${userValue || 'null'}</span></div>
+                <div class="item">Pi SDK: <span class="value">${typeof Pi !== 'undefined' ? 'O' : 'X'}</span></div>
+            `;
+            
+            document.body.appendChild(debugBox);
+            
+            // 5초 후 제거
+            setTimeout(() => {
+                if (debugBox.parentNode) {
+                    debugBox.remove();
+                }
+            }, 8000);
+            
+            return authValue;
+        }
+        
         // 1. 파이 네트워크 자산 연결 (SDK 초기화)
         try {
             if (typeof Pi !== 'undefined') {
                 Pi.init({ version: "2.0", sandbox: false });
                 
-                // ✅ 이미 인증됐는지 확인
-                if (sessionStorage.getItem('piAuthenticated') === 'true') {
-                    console.log("%c[Pi Genesis] 이미 인증 완료됨 (팝업 생략)", "color: #ffcc33; font-weight: bold;");
+                // ✅ sessionStorage 확인
+                const authValue = createDebugBox();
+                
+                if (authValue === 'true') {
+                    // 이미 인증됨 - 팝업 스킵
+                    console.log("%c[두 번째 페이지] 이미 인증 완료됨 (팝업 생략)", "color: #ffcc33; font-weight: bold;");
                 } else {
-                    // 처음이면 인증 팝업 실행
+                    // 처음 - 인증 팝업 실행
+                    console.log("%c[두 번째 페이지] 첫 방문, 인증 시작", "color: orange; font-weight: bold;");
                     Pi.authenticate(['username'], function(payment) {
-                        console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+                        console.log("%c[두 번째 페이지] 파이 인증 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
                         sessionStorage.setItem('piAuthenticated', 'true');
+                        sessionStorage.setItem('piUser', payment.user.username);
                     }).catch(function(error) {
-                        console.error("인증 실패:", error);
+                        console.error("[두 번째 페이지] 인증 실패:", error);
                     });
                 }
+            } else {
+                createDebugBox();
+                console.log("[두 번째 페이지] Pi SDK 없음");
             }
         } catch (err) {
-            console.log("파이 브라우저 환경이 아닙니다.");
+            createDebugBox();
+            console.log("[두 번째 페이지] 환경 오류:", err);
         }
 
-        // 2. 당신의 소중한 보안 스크립트 (우클릭, F12, 복사 차단)
+        // 2. 보안 스크립트
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
             if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
