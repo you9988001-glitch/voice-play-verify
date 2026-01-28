@@ -13,7 +13,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <title>code arche49-Pass | CODE ARCHE</title>
 
   <!-- Pi SDK -->
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://sdk.minepi.com/pi-sdk.js">
+
+Pi.init({ version: "2.0" });
+
+async function ensureAuthOnce() {
+  if (sessionStorage.getItem("pi_authed") === "yes") {
+    return true;
+  }
+  await Pi.authenticate(["payments"], onIncompletePaymentFound);
+  sessionStorage.setItem("pi_authed", "yes");
+  return true;
+}
+
+function onIncompletePaymentFound(payment) {
+  setLog("미완료 결제를 찾았습니다. Pi 월렛에서 취소하고 다시 시도하세요.");
+}
+</script>
 
   <!-- ✅ COPYRIGHT PROTECTION STYLES -->
   
