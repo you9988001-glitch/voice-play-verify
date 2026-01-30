@@ -423,22 +423,40 @@ function setVerifiedUI() {
   successBanner.textContent = "Thank you, future Guardian.";
 }
 
-// ✅ Pi SDK 초기화 (원본 그대로)
+// ✅ Pi SDK 초기화
 Pi.init({ version: "2.0" });
 
-async function ensureAuth() {
-  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+// ✅ 중복 인증 방지 함수 (sessionStorage 활용)
+async function ensureAuthOnce() {
+  if (sessionStorage.getItem("pi_authed") === "yes") {
+    return true;  // 이미 인증됨 → 팝업 안 뜸
+  }
+  await Pi.authenticate(["payments"], onIncompletePaymentFound);
+  sessionStorage.setItem("pi_authed", "yes");  // 인증 상태 저장
+  return true;
 }
 
 function onIncompletePaymentFound(payment) {
   setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
 }
 
-// ✅ 결제 시작 (원본 로직 그대로)
+// ✅ 페이지 로드 시 자동 인증 (1회만)
+(async function() {
+  if (typeof Pi !== 'undefined') {
+    try {
+      await ensureAuthOnce();
+      console.log("%c[CODE ARCHE] Pi 자산 연결 완료", "color: #ffa500; font-weight: bold;");
+    } catch (e) {
+      console.error("Pi 인증 실패:", e);
+    }
+  }
+})();
+
+// ✅ 결제 시작 (중복 인증 방지)
 async function startPayment() {
   try {
-    setLog("Pi 인증 중…");
-    await ensureAuth();
+    setLog("Pi 인증 확인 중…");
+    await ensureAuthOnce();  // 이미 인증되었으면 바로 통과
 
     setLog("결제 생성 중…");
 
