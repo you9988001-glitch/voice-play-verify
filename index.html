@@ -467,10 +467,7 @@ function onIncompletePaymentFound(payment) {
 
 async function startPayment() {
   try {
-    // ✅ 인증 상태 확인 (이미 인증되었으면 즉시 통과)
-    setLog("Pi 인증 확인 중…");
-    await Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
-    
+    // ✅ 페이지 로드 시 이미 인증 완료, 바로 결제만 실행
     setLog("결제 생성 중…");
 
     Pi.createPayment(
