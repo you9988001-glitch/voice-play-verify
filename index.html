@@ -328,19 +328,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
   </div>
 
-  <!-- ✅ 완전한 자산보호 및 Pi SDK 통합 스크립트 -->
+  <!-- ✅ 보안 스크립트 (Pi SDK와 독립적으로 즉시 실행) -->
   <script>
 (function() {
   'use strict';
 
-  // ========================================
-  // 1. 보안 장치 즉시 실행 (Pi SDK보다 우선)
-  // ========================================
-  
-  // 우클릭 차단
+  // 1. 우클릭 차단
   document.addEventListener('contextmenu', e => e.preventDefault());
   
-  // F12, Ctrl+Shift+I, Ctrl+U 차단
+  // 2. F12, Ctrl+Shift+I, Ctrl+U 차단
   document.addEventListener('keydown', e => {
     if (e.keyCode === 123 || 
         (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
@@ -349,18 +345,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   });
   
-  // 복사 차단
+  // 3. 복사 차단
   document.addEventListener('copy', e => e.preventDefault());
   
-  // 드래그 차단
+  // 4. 드래그 차단
   document.addEventListener('dragstart', e => e.preventDefault());
   
-  // 텍스트 선택 차단
+  // 5. 텍스트 선택 차단
   document.addEventListener('selectstart', e => e.preventDefault());
 
-  // ========================================
-  // 2. 워터마크 즉시 생성 (load 이벤트 의존 제거)
-  // ========================================
+  // 6. 워터마크 즉시 생성
   const watermark = document.createElement('div');
   watermark.innerHTML = '© CODE ARCHE';
   watermark.style.cssText = `
@@ -376,53 +370,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   `;
   document.body.appendChild(watermark);
 
-  // ========================================
-  // 3. 인쇄 방지
-  // ========================================
+  // 7. 인쇄 방지
   window.addEventListener('beforeprint', function(e) {
     e.preventDefault();
     alert('Printing is disabled for this protected content.');
     return false;
   });
 
-  // ========================================
-  // 4. iframe 삽입 방지
-  // ========================================
+  // 8. iframe 삽입 방지
   if (window.top !== window.self) {
     window.top.location = window.self.location;
-  }
-
-  // ========================================
-  // 5. Pi SDK 초기화 (첫 페이지 - 오프닝 역할)
-  // ========================================
-  let piAuthenticated = false;
-  
-  try {
-    if (typeof Pi !== 'undefined') {
-      Pi.init({ version: "2.0", sandbox: false });
-      
-      // ✅ 첫 페이지에서 payments 스코프로 즉시 인증
-      // 이렇게 해야 두 번째 페이지(Pi Genesis)에서 팝업 없이 세션 유지됨
-      Pi.authenticate(['username', 'payments'], function(auth) {
-        console.log("%c[CODE ARCHE] Pi 자산 연결 성공: " + auth.user.username, 
-                    "color: #ffa500; font-weight: bold;");
-        piAuthenticated = true;
-      }, {
-        onIncompletePaymentFound: function(payment) {
-          console.log("미완료 결제 발견:", payment);
-        }
-      }).catch(function(error) {
-        console.error("Pi 인증 실패:", error);
-      });
-    }
-  } catch (err) {
-    console.log("Pi 브라우저 환경이 아닙니다.");
   }
 
 })();
   </script>
 
-  <!-- ✅ 결제 및 폼 처리 스크립트 -->
+  <!-- ✅ Pi SDK 및 결제 스크립트 (원본 로직 그대로) -->
   <script>
 const applySection = document.getElementById("apply-section");
 const openApplyBtn = document.getElementById("openApplyBtn");
@@ -460,14 +423,23 @@ function setVerifiedUI() {
   successBanner.textContent = "Thank you, future Guardian.";
 }
 
-// ✅ payments 스코프는 이미 페이지 로드 시 인증됨
+// ✅ Pi SDK 초기화 (원본 그대로)
+Pi.init({ version: "2.0" });
+
+async function ensureAuth() {
+  return await Pi.authenticate(["payments"], onIncompletePaymentFound);
+}
+
 function onIncompletePaymentFound(payment) {
   setLog("Found incomplete payment. Please cancel it in Pi Wallet then try again.");
 }
 
+// ✅ 결제 시작 (원본 로직 그대로)
 async function startPayment() {
   try {
-    // ✅ 페이지 로드 시 이미 인증 완료, 바로 결제만 실행
+    setLog("Pi 인증 중…");
+    await ensureAuth();
+
     setLog("결제 생성 중…");
 
     Pi.createPayment(
@@ -509,7 +481,7 @@ async function startPayment() {
       }
     );
   } catch (e) {
-    setLog("결제 시작 실패: " + String(e));
+    setLog("초기화 실패: " + String(e));
   }
 }
 
