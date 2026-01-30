@@ -238,47 +238,55 @@
     (function() {
         'use strict';
        
-    
-    // 1. 보안 스크립트 먼저 실행 (Pi SDK보다 우선)
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
-            e.preventDefault();
-        }
-    });
-    document.addEventListener('copy', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
-    
-    // 2. 워터마크 즉시 생성 (Pi 인증 전에)
-    const watermark = document.createElement('div');
-    watermark.textContent = '© CODE ARCHE';
-    watermark.style.cssText = `position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255, 204, 51, 0.3); pointer-events: none; z-index: 9999; font-family: monospace; letter-spacing: 2px;`;
-    document.body.appendChild(watermark);
-    
-    // 3. Pi SDK 초기화 (두 번째 페이지이므로 재인증 불필요)
-    try {
-        if (typeof Pi !== 'undefined') {
-            Pi.init({ version: "2.0", sandbox: false });
-            
-            // ✅ 첫 페이지에서 이미 'payments' 스코프로 인증 완료
-            // 두 번째 페이지에서는 팝업 없이 자동 연결됨
-            console.log("%c[Pi Genesis] 파이 네트워크 연결 유지 중", "color: #ffcc33; font-weight: bold;");
-            
-            // 혹시 세션이 끊겼을 경우만 자동 재연결 (팝업 안 뜸)
-            Pi.authenticate(['username', 'payments'], function(auth) {
-                console.log("%c[연결 확인] " + auth.user.username, "color: #ffcc33;");
-            }, {
-                onIncompletePaymentFound: function(payment) {
-                    console.log("미완료 결제 발견:", payment);
-                }
-            }).catch(function(error) {
-                console.error("연결 상태 확인:", error);
-            });
-        }
-    } catch (err) {
-        console.log("Pi 브라우저 환경이 아닙니다.");
+ // ✅ 팝업 중복 방지 및 자산 연결 핵심 매듭
+ try {
+    if (typeof Pi !== 'undefined') {
+        Pi.init({ version: "2.0" });
+        // 'payments'까지 한꺼번에 요청해야 다음 페이지에서 팝업이 안 뜹니다.
+        Pi.authenticate(['payments'], function(payment) {
+            console.log("연결 성공: " + payment.);
+        }).catch(function(error) {
+            console.error("인증 지연:", error);
+        });
     }
-})();
+} catch (e) {
+    console.log("브라우저 환경 확인 중...");
+}
+
+        // 1. 파이 네트워크 자산 연결 (SDK 초기화)
+        try {
+            if (typeof Pi !== 'undefined') 
+               
+          // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다 (자산 기록의 시작)
+                Pi.authenticate(['payment'], function(payment) {
+                    console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+                }).catch(function(error) {
+                    console.error("인증 실패:", error);
+                });
+            }
+        } catch (err) {
+            console.log("파이 브라우저 환경이 아닙니다.");
+        }
+
+        // 2. 당신의 소중한 보안 스크립트 (우클릭, F12, 복사 차단)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+            }
+        });
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        // 3. 워터마크 레이어 추가
+        window.addEventListener('load', () => {
+            const watermark = document.createElement('div');
+            watermark.textContent = '© CODE ARCHE';
+            watermark.style.cssText = `position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255, 204, 51, 0.2); pointer-events: none; z-index: 9999; font-family: monospace; letter-spacing: 2px;`;
+            document.body.appendChild(watermark);
+        });
+    })();
     </script>
+
 </body>
 </html>
