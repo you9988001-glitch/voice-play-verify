@@ -234,59 +234,79 @@
         </div>
     </div>
 
-    <script>
-    (function() {
-        'use strict';
-       
- // ✅ 팝업 중복 방지 및 자산 연결 핵심 매듭
- try {
-    if (typeof Pi !== 'undefined') {
-        Pi.init({ version: "2.0" });
-        // 'payments'까지 한꺼번에 요청해야 다음 페이지에서 팝업이 안 뜹니다.
-        Pi.authenticate(['username''payments'], function(payment) {
-            console.log("연결 성공: " + payment.);
-        }).catch(function(error) {
-            console.error("인증 지연:", error);
-        });
-    }
-} catch (e) {
-    console.log("브라우저 환경 확인 중...");
-}
+       <script>
+(function() {
+    'use strict';
 
-        // 1. 파이 네트워크 자산 연결 (SDK 초기화)
+    // 1. 파이 네트워크 통합 초기화 및 인증
+    function initPiNetwork() {
         try {
             if (typeof Pi !== 'undefined') {
+                // 한 번만 초기화
                 Pi.init({ version: "2.0", sandbox: false });
-                
-                // 앱 실행 시 자동으로 팝업을 띄워 유저를 인증합니다 (자산 기록의 시작)
-                Pi.authenticate(['username'], function(payment) {
-                    console.log("%c[Pi Genesis] 파이 본부 연결 성공: " + payment.user.username, "color: #ffcc33; font-weight: bold;");
+
+                // 필요한 권한(username, payments)을 한꺼번에 요청하여 팝업 중복 방지
+                Pi.authenticate(['username', 'payments'], function(auth) {
+                    console.log("%c[Pi Genesis] 연결 성공: " + auth.user.username, "color: #ffcc33; font-weight: bold;");
                 }).catch(function(error) {
-                    console.error("인증 실패:", error);
+                    console.error("파이 인증 지연 또는 거부:", error);
                 });
             }
-        } catch (err) {
-            console.log("파이 브라우저 환경이 아닙니다.");
+        } catch (e) {
+            console.log("환경 확인 중...");
         }
+    }
 
-        // 2. 당신의 소중한 보안 스크립트 (우클릭, F12, 복사 차단)
+    // 2. 보안 기능 (우클릭, F12, 복사 차단) - 즉시 실행
+    function applySecurity() {
+        // 우클릭 방지
         document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // 개발자 도구 및 소스 보기 단축키 방지
         document.addEventListener('keydown', e => {
-            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
+            if (e.keyCode === 123 || // F12
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || // Ctrl+Shift+I/J
+               (e.ctrlKey && e.keyCode === 85)) { // Ctrl+U
                 e.preventDefault();
+                return false;
             }
         });
+
+        // 복사 및 드래그 방지
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('dragstart', e => e.preventDefault());
+    }
 
-        // 3. 워터마크 레이어 추가
-        window.addEventListener('load', () => {
-            const watermark = document.createElement('div');
-            watermark.textContent = '© CODE ARCHE';
-            watermark.style.cssText = `position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255, 204, 51, 0.2); pointer-events: none; z-index: 9999; font-family: monospace; letter-spacing: 2px;`;
-            document.body.appendChild(watermark);
-        });
-    })();
-    </script>
+    // 3. 워터마크 추가
+    function addWatermark() {
+        const watermark = document.createElement('div');
+        watermark.textContent = '© CODE ARCHE';
+        watermark.style.cssText = `
+            position: fixed; 
+            bottom: 10px; 
+            right: 10px; 
+            font-size: 10px; 
+            color: rgba(255, 204, 51, 0.2); 
+            pointer-events: none; 
+            z-index: 9999; 
+            font-family: monospace; 
+            letter-spacing: 2px;
+        `;
+        document.body.appendChild(watermark);
+    }
+
+    // 실행 순서 정렬
+    applySecurity(); // 보안은 가장 먼저
+    initPiNetwork(); // 파이 연결
+    
+    if (document.readyState === 'complete') {
+        addWatermark();
+    } else {
+        window.addEventListener('load', addWatermark);
+    }
+
+})();
+</script>
+ 
 </body>
 </html>
