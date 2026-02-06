@@ -449,7 +449,7 @@ function setVerifiedUI() {
   successBanner.textContent = "Thank you, future Guardian.";
 }
 
-Pi.init({ version: "2.0", sandbox: true });
+Pi.init({ version: "2.0" });
 
 async function ensureAuth() {
   return await Pi.authenticate(["payments"], onIncompletePaymentFound);
